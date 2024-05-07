@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/nav_home"
+    android:title="Home"
+    android:icon="@drawable/baseline_category_24"/>
+
+
+
+    <item android:id="@+id/nav_user"
+        android:title="User"
+        android:icon="@drawable/baseline_groups_24"/>
+
+    <item android:id="@+id/nav_profie"
+        android:title="Profile"
+        android:icon="@drawable/baseline_account_circle_24"/>
+
+    <item android:id="@+id/nav_chat"
+        android:title="Chat"
+        android:icon="@drawable/baseline_chat_24"/>
+
+    <item android:id="@+id/nav_mutilChoice"
+        android:title="Options"
+        android:icon="@drawable/baseline_density_medium_24"/>
+</menu>
