@@ -28,8 +28,7 @@
             android:id="@+id/imageIv"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:minHeight="200dp"
-            android:src="@drawable/baseline_camera_alt_24">
+            android:minHeight="200dp">
         </ImageView>
 
         <EditText

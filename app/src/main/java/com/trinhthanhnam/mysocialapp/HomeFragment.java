@@ -149,22 +149,27 @@ public class HomeFragment extends Fragment {
                             Post post = ds.getValue(Post.class);
                             postList.add(post);
                         }
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapterPost = new AdapterPost(getActivity(), postList);
-                                recyclerView.setAdapter(adapterPost);
-                            }
-                        });
+                        if(getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapterPost = new AdapterPost(getActivity(), postList);
+                                    recyclerView.setAdapter(adapterPost);
+
+                                }
+                            });
+                        }
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if(getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -193,6 +198,7 @@ public class HomeFragment extends Fragment {
 
             }
         });
+
     }
 
     private void getAllPost() {
@@ -209,7 +215,9 @@ public class HomeFragment extends Fragment {
                     postList.add(post);
                 }
                 // Notify the adapter that the data set has changed
-                adapterPost.notifyDataSetChanged();
+                if(adapterPost != null){
+                    adapterPost.notifyDataSetChanged();
+                }
             }
 
             @Override

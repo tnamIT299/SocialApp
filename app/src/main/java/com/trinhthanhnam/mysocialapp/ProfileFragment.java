@@ -337,14 +337,16 @@ public class ProfileFragment extends Fragment {
                             postList.add(myPost);
 
                             //adapter
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapterPost = new AdapterPost(getActivity(), postList);
-                                    //set adapter to recyclerview
-                                    recyclerViewPost.setAdapter(adapterPost);
-                                }
-                            });
+                            if(getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapterPost = new AdapterPost(getActivity(), postList);
+                                        //set adapter to recyclerview
+                                        recyclerViewPost.setAdapter(adapterPost);
+                                    }
+                                });
+                            }
                         }
                     }
 
