@@ -1,22 +1,7 @@
 package com.trinhthanhnam.mysocialapp.model;
 
 public class Post {
-    String pId , pTitle , pDescr , pImage , pTime , uid , uEmail , uDp , uName;
-
-    public Post() {
-    }
-
-    public Post(String pId, String pTitle, String pDescr, String pImage, String pTime, String uid, String uEmail, String uDp, String uName) {
-        this.pId = pId;
-        this.pTitle = pTitle;
-        this.pDescr = pDescr;
-        this.pImage = pImage;
-        this.pTime = pTime;
-        this.uid = uid;
-        this.uEmail = uEmail;
-        this.uDp = uDp;
-        this.uName = uName;
-    }
+    String pId , pTitle , pDescr,pLikes,pComments , pImage , pTime , uid , uEmail , uDp , uName;
 
     public String getpId() {
         return pId;
@@ -40,6 +25,22 @@ public class Post {
 
     public void setpDescr(String pDescr) {
         this.pDescr = pDescr;
+    }
+
+    public String getpLikes() {
+        return pLikes;
+    }
+
+    public void setpLikes(String pLikes) {
+        this.pLikes = pLikes;
+    }
+
+    public String getpComments() {
+        return pComments;
+    }
+
+    public void setpComments(String pComments) {
+        this.pComments = pComments;
     }
 
     public String getpImage() {
@@ -89,4 +90,22 @@ public class Post {
     public void setuName(String uName) {
         this.uName = uName;
     }
+
+    public Post(String pId, String pTitle, String pDescr, String pLikes, String pComments, String pImage, String pTime, String uid, String uEmail, String uDp, String uName) {
+        this.pId = pId;
+        this.pTitle = pTitle;
+        this.pDescr = pDescr;
+        this.pLikes = pLikes;
+        this.pComments = pComments;
+        this.pImage = pImage;
+        this.pTime = pTime;
+        this.uid = uid;
+        this.uEmail = uEmail;
+        this.uDp = uDp;
+        this.uName = uName;
+    }
+
+    public Post() {
+    }
+
 }
