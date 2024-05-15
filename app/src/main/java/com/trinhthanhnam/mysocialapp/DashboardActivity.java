@@ -3,6 +3,8 @@ package com.trinhthanhnam.mysocialapp;
 import static com.google.android.gms.auth.zzl.getToken;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ public class DashboardActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     TextView txt_proFile;
     String mUID;
+    private AlertDialog alertDialog;
 
 
     @SuppressLint("MissingInflatedId")
@@ -147,16 +150,35 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+        alertDialog =  new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Exist App")
+                .setMessage("Are you sure you want to close this app?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(DashboardActivity.this, LoginActivity.class));
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     @Override
     protected void onStart() {
         checkUserstatus();
         super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (alertDialog != null && alertDialog.isShowing()) {
+            alertDialog.dismiss();
+        }
     }
 
     @Override
@@ -176,4 +198,6 @@ public class DashboardActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

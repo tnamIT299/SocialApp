@@ -55,6 +55,7 @@ public class PostDetailActivity extends AppCompatActivity {
     RecyclerView commentRecyclerView;
     List<Comment> commentList;
     AdapterComment adapterComment;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +240,9 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void likePost() {
+        // Lưu vị trí cuộn hiện tại
+        int scrollPosition = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+
         mProcessLike = true;
         final DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
         final DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
@@ -263,6 +267,9 @@ public class PostDetailActivity extends AppCompatActivity {
 
             }
         });
+
+        // Đặt lại vị trí cuộn
+        recyclerView.scrollToPosition(scrollPosition);
     }
 
     private void postComment() {

@@ -88,10 +88,10 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewPost"
-                android:layout_below="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
+                android:layout_height="match_parent"
+                android:layout_below="@+id/linearLayout"
+                android:layout_marginTop="0dp">
 
             </androidx.recyclerview.widget.RecyclerView>
         </RelativeLayout>

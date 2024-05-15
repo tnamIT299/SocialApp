@@ -220,32 +220,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-//    private void readMessage() {
-//        chatList = new ArrayList<>();
-//        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Chats");
-//        dbRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                chatList.clear();
-//                for (DataSnapshot ds: snapshot.getChildren()){
-//                    Chat chat = ds.getValue(Chat.class);
-//                    if(chat.getReceiver().equals(myUid) && chat.getSender().equals(hisuid) ||
-//                             chat.getReceiver().equals(hisuid) && chat.getSender().equals(myUid)){
-//                        chatList.add(chat);
-//                    }
-//                    adapterChat = new AdapterChat(ChatActivity.this, chatList, hisImage);
-//                    adapterChat.notifyDataSetChanged();
-//                    recyclerView.setAdapter(adapterChat);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
-
     private void readMessage() {
         new Thread(new Runnable() {
             @Override
@@ -303,6 +277,39 @@ public class ChatActivity extends AppCompatActivity {
                     sendNotification(hisuid, user.getName(),message);
                 }
                 notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        final DatabaseReference chatRef1 = FirebaseDatabase.getInstance().getReference("ChatList")
+                .child(myUid)
+                .child(hisuid);
+        chatRef1.addValueEventListener(new ValueEventListener() {
+       @Override
+       public void onDataChange(@NonNull DataSnapshot snapshot) {
+              if(!snapshot.exists()){
+                chatRef1.child("id").setValue(hisuid);
+              }
+       }
+
+       @Override
+       public void onCancelled(@NonNull DatabaseError error) {
+
+       }
+   });
+
+        final DatabaseReference chatRef2 = FirebaseDatabase.getInstance().getReference("ChatList")
+                        .child(hisuid)
+                        .child(myUid);
+        chatRef2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()){
+                    chatRef2.child("id").setValue(myUid);
+                }
             }
 
             @Override
