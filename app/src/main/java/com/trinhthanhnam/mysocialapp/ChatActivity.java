@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.RequestQueue;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +33,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterChat;
 import com.trinhthanhnam.mysocialapp.model.Chat;
@@ -347,7 +350,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendNotificationToToken(String hisuid, String name, String message, String token) {
-        // Assuming myUid and icon are defined elsewhere in your code
         Data data = new Data(myUid, R.drawable.baseline_account_circle_24, name + ": " + message, "New Message", hisuid);
         Sender sender = new Sender(data, token);
         apiService.sendNotification(sender).enqueue(new Callback<Response>() {
@@ -361,6 +363,7 @@ public class ChatActivity extends AppCompatActivity {
                 Log.e("Notification Error", "Failed to send notification: " + t.getMessage());
             }
         });
+
     }
 
 

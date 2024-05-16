@@ -2,6 +2,9 @@ package com.trinhthanhnam.mysocialapp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -36,6 +40,8 @@ import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterComment;
 import com.trinhthanhnam.mysocialapp.model.Comment;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -47,7 +53,7 @@ public class PostDetailActivity extends AppCompatActivity {
     ImageView postImageIv,postUImg,AvatarImg;
     TextView postUName,postTime,postTitleTv,postDescriptionTv,postLikeTv,postCommentTv;
     ImageButton btnMore,btnSend;
-    Button btnLike;
+    Button btnLike,btnShare;
     EditText edtComment;
     boolean mProcessComment = false;
     boolean mProcessLike = false;
@@ -76,6 +82,7 @@ public class PostDetailActivity extends AppCompatActivity {
         btnMore = findViewById(R.id.btnMore);
         btnSend = findViewById(R.id.btnSend);
         btnLike = findViewById(R.id.btnLike);
+        btnShare = findViewById(R.id.btnShare);
         commentRecyclerView = findViewById(R.id.commentRecyclerView);
         edtComment = findViewById(R.id.edtComment);
 
@@ -103,6 +110,65 @@ public class PostDetailActivity extends AppCompatActivity {
                 showMoreOptions();
             }
         });
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pTitle = postTitleTv.getText().toString().trim();
+                String pDescr = postDescriptionTv.getText().toString().trim();
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) postImageIv.getDrawable();
+                if (bitmapDrawable == null) {
+                    //post without image
+                    shareTextOnly(pTitle, pDescr);
+                } else {
+                    Bitmap bitmap = bitmapDrawable.getBitmap();
+                    shareImageandText(pTitle, pDescr, bitmap);
+                }
+            }
+        });
+
+    }
+
+
+    private void shareImageandText(String pTitle, String pDescr, Bitmap bitmap) {
+        String shareBody = pTitle + "\n" + pDescr;
+        //first we will save this image in cache, get the saved image uri
+        Uri uri = saveImageToShare(bitmap);
+
+        //share intent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
+        intent.setType("image/png");
+        startActivity(Intent.createChooser(intent, "Share Via"));
+
+    }
+
+    private Uri saveImageToShare(Bitmap bitmap) {
+        File imageFolder = new File(getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imageFolder.mkdirs();
+            File file = new File(imageFolder, "shared_image.png");
+            FileOutputStream fileInputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fileInputStream);
+            fileInputStream.flush();
+            fileInputStream.close();
+            uri = FileProvider.getUriForFile(this, "com.trinhthanhnam.mysocialapp.fileprovider", file);
+
+        }catch (Exception e) {
+            Toast.makeText(this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return uri;
+    }
+
+    private void shareTextOnly(String pTitle, String pDescr) {
+        String shareBody = pTitle + "\n" + pDescr;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
     private void loadComments() {

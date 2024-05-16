@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -43,7 +46,11 @@ import com.trinhthanhnam.mysocialapp.R;
 import com.trinhthanhnam.mysocialapp.ThereProfileActivity;
 import com.trinhthanhnam.mysocialapp.model.Post;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,6 +78,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         return new MyHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
             String uid = postList.get(position).getUid();
@@ -96,6 +104,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         holder.pDescriptionTv.setText(pDescr);
         holder.pLikesTv.setText(pLikes+" Likes");
         holder.pCommentsTv.setText(pComments+" Comments");
+
         setLikes(holder,pId);
 
 
@@ -172,9 +181,14 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         holder.shareBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, PostDetailActivity.class);
-                intent.putExtra("postId", pId);
-                context.startActivity(intent);
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.pImageIv.getDrawable();
+                if (bitmapDrawable == null) {
+                    //post without image
+                    shareTextOnly(pTitle, pDescr);
+                } else {
+                    Bitmap bitmap = bitmapDrawable.getBitmap();
+                    shareImageandText(pTitle, pDescr, bitmap);
+                }
             }
         });
 
@@ -186,6 +200,49 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
                 context.startActivity(intent);
             }
         });
+    }
+
+
+    private void shareImageandText(String pTitle, String pDescr, Bitmap bitmap) {
+        String shareBody = pTitle + "\n" + pDescr;
+        //first we will save this image in cache, get the saved image uri
+        Uri uri = saveImageToShare(bitmap);
+
+        //share intent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
+        intent.setType("image/png");
+        context.startActivity(Intent.createChooser(intent, "Share Via"));
+
+    }
+
+    private Uri saveImageToShare(Bitmap bitmap) {
+        File imageFolder = new File(context.getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imageFolder.mkdirs();
+            File file = new File(imageFolder, "shared_image.png");
+            FileOutputStream fileInputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fileInputStream);
+            fileInputStream.flush();
+            fileInputStream.close();
+            uri = FileProvider.getUriForFile(context, "com.trinhthanhnam.mysocialapp.fileprovider", file);
+
+        }catch (Exception e) {
+            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return uri;
+    }
+
+    private void shareTextOnly(String pTitle, String pDescr) {
+        String shareBody = pTitle + "\n" + pDescr;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        context.startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
     private void setLikes(final MyHolder holder,final String postKey) {
@@ -331,6 +388,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             shareBtn = itemView.findViewById(R.id.btnShare);
             profileLayout = itemView.findViewById(R.id.profileLayout);
             pCommentsTv = itemView.findViewById(R.id.pCommentsTv);
+
         }
     }
 }
