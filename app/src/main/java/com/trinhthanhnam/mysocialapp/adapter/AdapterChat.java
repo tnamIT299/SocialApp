@@ -10,12 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -67,10 +69,24 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
         //get data
         String message = chatList.get(position).getMessage();
         String timeStamp = chatList.get(position).getTimestamp();
+        String type = chatList.get(position).getType();
         //convert time stamp to dd/mm/yyyy hh:mm am/pm
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(Long.parseLong(timeStamp));
         String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
+         if(type.equals("text")) {
+             //text message
+             holder.messageTv.setVisibility(View.VISIBLE);
+             holder.messageIv.setVisibility(View.GONE);
+             holder.messageTv.setText(message);
+         }else{
+                //image message
+                holder.messageTv.setVisibility(View.GONE);
+                holder.messageIv.setVisibility(View.VISIBLE);
+                Glide.with(context).load(message).into(holder.messageIv);
+
+         }
+
         //set data
         holder.messageTv.setText(message);
         holder.timeTv.setText(dateTime);
@@ -170,15 +186,16 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
     //view holder class
     class MyHolder extends RecyclerView.ViewHolder{
         //views
-        ImageView profileIv;
+        ImageView profileIv, messageIv;
         TextView messageTv, timeTv, isSeenTv;
-        LinearLayout messageLayout; //for click listener to show delete
+        RelativeLayout messageLayout; //for click listener to show delete
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
 
             //init views
             profileIv = itemView.findViewById(R.id.profileIv);
+            messageIv = itemView.findViewById(R.id.messageIv);
             messageTv = itemView.findViewById(R.id.messageTv);
             timeTv = itemView.findViewById(R.id.timeTv);
             isSeenTv= itemView.findViewById(R.id.seenTv);

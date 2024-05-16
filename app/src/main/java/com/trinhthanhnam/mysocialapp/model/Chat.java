@@ -1,18 +1,19 @@
 package com.trinhthanhnam.mysocialapp.model;
 
 public class Chat {
-    String message, receiver, sender, timeStamp;
+    String message, receiver, sender, timeStamp, type;
     boolean isSeen;
 
     public Chat() {
     }
 
-    public Chat(String message, String receiver, String sender, String timeStamp, boolean isSeen) {
+    public Chat(String message, String receiver, String sender, String timeStamp, boolean isSeen, String type) {
         this.message = message;
         this.receiver = receiver;
         this.sender = sender;
         this.timeStamp = timeStamp;
         this.isSeen = isSeen;
+        this.type = type;
     }
 
     public String getMessage() {
@@ -54,4 +55,13 @@ public class Chat {
     public void setSeen(boolean seen) {
         isSeen = seen;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 }

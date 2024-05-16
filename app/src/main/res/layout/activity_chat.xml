@@ -67,6 +67,16 @@
         android:gravity="center"
         android:background="@color/white">
 
+        <ImageButton
+            android:id="@+id/attachBtn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/baseline_image_24"
+            android:padding="10dp"
+            android:background="@color/white"
+            android:layout_marginEnd="5dp"/>
+
 
         <EditText
             android:id="@+id/messageEt"
