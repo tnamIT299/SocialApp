@@ -7,11 +7,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.trinhthanhnam.mysocialapp.ChatActivity;
 import com.trinhthanhnam.mysocialapp.R;
 import com.trinhthanhnam.mysocialapp.model.ChatList;
@@ -23,12 +30,17 @@ import java.util.List;
 public class AdapterChatList extends RecyclerView.Adapter<AdapterChatList.MyHolder>{
     Context context;
     List<User> userList;
+    FirebaseAuth firebaseAuth;
+
+    String myUid;
     private HashMap<String, String> lastMessageMap;
 
     public AdapterChatList(Context context, List<User> userList) {
         this.context = context;
         this.userList = userList;
         lastMessageMap = new HashMap<>();
+        firebaseAuth = FirebaseAuth.getInstance();
+        myUid = firebaseAuth.getUid();
     }
 
     @NonNull
@@ -70,9 +82,28 @@ public class AdapterChatList extends RecyclerView.Adapter<AdapterChatList.MyHold
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("hisUID", hisUid);
-                context.startActivity(intent);
+                // Kiểm tra xem người dùng hiện tại có bị chặn bởi người dùng khác hay không
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                ref.child(hisUid).child("BlockedUsers").orderByChild("uid").equalTo(myUid)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    // Người dùng hiện tại bị chặn, hiển thị thông báo
+                                    Toast.makeText(context, "You're blocked by that user,can't send message", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    // Người dùng hiện tại không bị chặn, mở ChatActivity
+                                    Intent intent = new Intent(context, ChatActivity.class);
+                                    intent.putExtra("hisUID", hisUid);
+                                    context.startActivity(intent);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
@@ -80,6 +111,28 @@ public class AdapterChatList extends RecyclerView.Adapter<AdapterChatList.MyHold
     public void setLastMessageMap(String userId, String lastMessage){
         lastMessageMap.put(userId, lastMessage);
     }
+
+
+//    private void checkIsBlocked(String hisUID, AdapterUser.MyHolder holder, int position) {
+//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+//        ref.child(myUid).child("BlockedUsers").orderByChild("uid").equalTo(hisUID)
+//                .addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        for (DataSnapshot ds : snapshot.getChildren()){
+//                            if(ds.exists()){
+//                                holder.blockIv.setImageResource(R.drawable.ic_blocked);
+//                                userList.get(position).setBlocked(true);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//    }
 
     @Override
     public int getItemCount() {

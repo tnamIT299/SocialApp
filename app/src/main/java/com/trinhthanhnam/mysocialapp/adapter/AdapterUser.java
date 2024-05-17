@@ -1,5 +1,6 @@
 package com.trinhthanhnam.mysocialapp.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -52,7 +53,7 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, @SuppressLint("RecyclerView") int position) {
             //get data
         String hisUID = userList.get(position).getUid();
         String userImage = userList.get(position).getImage();
@@ -108,10 +109,6 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
         });
     }
     private void imBlockedORNot(String hisUID){
-        //first check if sender(current user ) is blocked by receiver or not
-        // Logic : if uid of the sender(current user ) exists in "BlockedUsers" of receiver then sender(current user) is blocked, otherwise not
-        // if blocked then just display a message e.g. Yout're blocked by that user, can't send message
-        // if not blocked then simply start the chat activity
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
         ref.child(hisUID ).child("BlockedUsers").orderByChild("uid").equalTo(myUid)
                 .addValueEventListener(new ValueEventListener() {
