@@ -13,7 +13,6 @@
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/lavender">
 
-
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/profileIv"
             android:layout_width="35dp"
@@ -22,7 +21,7 @@
             android:src="@drawable/baseline_account_circle_24"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
@@ -30,21 +29,41 @@
 
             <TextView
                 android:id="@+id/nameTv"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
+                android:layout_gravity="start"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/userStatusTv"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:text="Online"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                />
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="end">
+            <ImageButton
+                android:id="@+id/callIvbtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/baseline_call_24"
+                android:background="@color/lavender"/>
+            <ImageButton
+                android:id="@+id/videoCallIvbtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/baseline_duo_24"
+                android:background="@color/lavender"/>
         </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>

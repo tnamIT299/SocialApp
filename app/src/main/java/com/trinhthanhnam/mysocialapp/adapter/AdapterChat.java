@@ -84,7 +84,6 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
                 holder.messageTv.setVisibility(View.GONE);
                 holder.messageIv.setVisibility(View.VISIBLE);
                 Glide.with(context).load(message).into(holder.messageIv);
-
          }
 
         //set data
@@ -119,6 +118,28 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
                 //create and show dialog
                 builder.create().show();
                 return true;
+            }
+        });
+        holder.messageIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //show image in dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                //set image in dialog
+                ImageView imageView = new ImageView(context);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(1200, 1200);
+                imageView.setLayoutParams(layoutParams);
+                Glide.with(context).load(message).into(imageView);
+                builder.setView(imageView);
+                //set cancel button
+                builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                //show dialog
+                builder.create().show();
             }
         });
 

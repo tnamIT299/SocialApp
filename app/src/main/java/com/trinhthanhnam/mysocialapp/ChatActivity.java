@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -81,7 +82,7 @@ import retrofit2.Callback;
 public class ChatActivity extends AppCompatActivity {
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ImageButton btn_send, attachBtn;
+    ImageButton btn_send, attachBtn, callIvbtn, videoCallIvbtn;
     ImageView profileIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
@@ -129,6 +130,8 @@ public class ChatActivity extends AppCompatActivity {
         messageEt = findViewById(R.id.messageEt);
         btn_send = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
+        callIvbtn = findViewById(R.id.callIvbtn);
+        videoCallIvbtn = findViewById(R.id.videoCallIvbtn);
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -173,10 +176,14 @@ public class ChatActivity extends AppCompatActivity {
                             userStatusTv.setText(onlineStatus);
                         }else{
                             //convert time stamp to dd/mm/yyyy hh:mm am/pm
-                            Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-                            cal.setTimeInMillis(Long.parseLong(onlineStatus));
-                            String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
-                            userStatusTv.setText("Last seen at: "+dateTime);
+//                            Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+//                            cal.setTimeInMillis(Long.parseLong(onlineStatus));
+//                            String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
+//                            userStatusTv.setText("Last seen at: "+dateTime);
+
+                            long onlineStatusTime = Long.parseLong(onlineStatus);
+                            String timeAgo = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+                            userStatusTv.setText("Last seen: " + timeAgo);
                         }
                     }
 
@@ -190,6 +197,21 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        callIvbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = nameTv.getText().toString();
+                System.out.println("Call to: " + name);
+            }
+        });
+
+        videoCallIvbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
             }
         });
