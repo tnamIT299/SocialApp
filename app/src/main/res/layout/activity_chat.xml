@@ -30,24 +30,26 @@
             android:orientation="vertical"
             android:gravity="center"
             android:layout_weight="1"
-            android:layout_marginStart="25dp">
+            android:layout_marginStart="20dp">
 
             <TextView
                 android:id="@+id/nameTv"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
+                android:layout_gravity="start"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/userStatusTv"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_gravity="start"
                 android:layout_height="wrap_content"
                 android:text="Online"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="12sp"
                 />
         </LinearLayout>
             <ImageView

@@ -15,11 +15,13 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +87,8 @@ public class ChatActivity extends AppCompatActivity {
     TextView nameTv , userStatusTv;
     EditText messageEt;
 
+    LinearLayout typingLayout;
+
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference usersDbRef;
@@ -130,6 +134,7 @@ public class ChatActivity extends AppCompatActivity {
         btn_send = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
         blockIv = findViewById(R.id.blockIv);
+        typingLayout = findViewById(R.id.typingLayout);
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -174,10 +179,9 @@ public class ChatActivity extends AppCompatActivity {
                             userStatusTv.setText(onlineStatus);
                         }else{
                             //convert time stamp to dd/mm/yyyy hh:mm am/pm
-                            Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-                            cal.setTimeInMillis(Long.parseLong(onlineStatus));
-                            String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
-                            userStatusTv.setText("Last seen at: "+dateTime);
+                            long onlineStatusTime = Long.parseLong(onlineStatus);
+                            String timeAgo = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+                            userStatusTv.setText("Last seen: " + timeAgo);
                         }
                     }
 
@@ -243,8 +247,10 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isBlocked){
                     unBlockUser();
+                    typingLayout.setVisibility(View.VISIBLE);
                 }else{
                     blockUser();
+                    typingLayout.setVisibility(View.GONE);
                 }
             }
         });
@@ -264,6 +270,7 @@ public class ChatActivity extends AppCompatActivity {
                             if(ds.exists()){
                                 blockIv.setImageResource(R.drawable.ic_blocked);
                                 isBlocked = true;
+                                typingLayout.setVisibility(View.GONE); // Hide the typingLayout
                             }
                         }
                     }
@@ -277,7 +284,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void blockUser() {
         //block the user , by addding uid to current user's "BlockedUsers" node
-
         //put values in hashmap to put in db
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("uid",hisuid);
@@ -289,6 +295,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         Toast.makeText(ChatActivity.this, "Block Successfully...", Toast.LENGTH_SHORT).show();
                         blockIv.setImageResource(R.drawable.ic_blocked);
+                        typingLayout.setVisibility(View.GONE);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -314,6 +321,7 @@ public class ChatActivity extends AppCompatActivity {
                                             public void onSuccess(Void unused) {
                                                 Toast.makeText(ChatActivity.this, "Unblocked Successfully...", Toast.LENGTH_SHORT).show();
                                                 blockIv.setImageResource(R.drawable.ic_unblocked);
+                                                typingLayout.setVisibility(View.VISIBLE);
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {

@@ -112,7 +112,6 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
         // Logic : if uid of the sender(current user ) exists in "BlockedUsers" of receiver then sender(current user) is blocked, otherwise not
         // if blocked then just display a message e.g. Yout're blocked by that user, can't send message
         // if not blocked then simply start the chat activity
-
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
         ref.child(hisUID ).child("BlockedUsers").orderByChild("uid").equalTo(myUid)
                 .addValueEventListener(new ValueEventListener() {
