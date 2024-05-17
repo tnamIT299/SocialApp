@@ -12,7 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/lavender">
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/profileIv"
@@ -22,10 +25,11 @@
             android:src="@drawable/baseline_account_circle_24"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
+            android:layout_weight="1"
             android:layout_marginStart="25dp">
 
             <TextView
@@ -45,6 +49,14 @@
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 />
+        </LinearLayout>
+            <ImageView
+                android:id="@+id/blockIv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_unblocked"/>
         </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
@@ -76,8 +88,6 @@
             android:padding="10dp"
             android:background="@color/white"
             android:layout_marginEnd="5dp"/>
-
-
         <EditText
             android:id="@+id/messageEt"
             android:layout_width="0dp"

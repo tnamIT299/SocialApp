@@ -36,8 +36,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.RequestQueue;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -56,6 +54,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterChat;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterUser;
 import com.trinhthanhnam.mysocialapp.model.Chat;
 import com.trinhthanhnam.mysocialapp.model.User;
 import com.trinhthanhnam.mysocialapp.notifications.APIService;
@@ -82,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
     Toolbar toolbar;
     RecyclerView recyclerView;
     ImageButton btn_send, attachBtn;
-    ImageView profileIv;
+    ImageView profileIv,blockIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
 
@@ -98,6 +97,7 @@ public class ChatActivity extends AppCompatActivity {
     String hisuid;
     String myUid;
     String hisImage;
+    boolean isBlocked = false;
     Uri uriImage = null;
 
     APIService apiService;
@@ -129,6 +129,7 @@ public class ChatActivity extends AppCompatActivity {
         messageEt = findViewById(R.id.messageEt);
         btn_send = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
+        blockIv = findViewById(R.id.blockIv);
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -237,9 +238,99 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+        blockIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isBlocked){
+                    unBlockUser();
+                }else{
+                    blockUser();
+                }
+            }
+        });
 
         readMessage();
+        checkIsBlocked();
         seenMessage();
+
+    }
+    private void checkIsBlocked() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(firebaseAuth.getUid()).child("BlockedUsers").orderByChild("uid").equalTo(hisuid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()){
+                            if(ds.exists()){
+                                blockIv.setImageResource(R.drawable.ic_blocked);
+                                isBlocked = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void blockUser() {
+        //block the user , by addding uid to current user's "BlockedUsers" node
+
+        //put values in hashmap to put in db
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("uid",hisuid);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(myUid).child("BlockedUsers").child(hisuid).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(ChatActivity.this, "Block Successfully...", Toast.LENGTH_SHORT).show();
+                        blockIv.setImageResource(R.drawable.ic_blocked);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ChatActivity.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void unBlockUser() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(myUid).child("BlockedUsers").orderByChild("uid").equalTo(hisuid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()){
+                            if(ds.exists()){
+                                ds.getRef().removeValue()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Toast.makeText(ChatActivity.this, "Unblocked Successfully...", Toast.LENGTH_SHORT).show();
+                                                blockIv.setImageResource(R.drawable.ic_unblocked);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(ChatActivity.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
     }
 
