@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
@@ -17,27 +17,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:layout_gravity="center">
-
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Name"
-                android:textSize="15sp"
-                android:textStyle="bold"/>
+               <TextView
+                   android:id="@+id/tvName"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Name"
+                   android:textSize="18sp"
+                   android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
         </LinearLayout>
-
-
+        <ImageView
+            android:id="@+id/blockIv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_unblocked"/>
 
     </LinearLayout>
 

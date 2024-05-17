@@ -15,7 +15,6 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -37,8 +36,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.RequestQueue;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -57,6 +54,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterChat;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterUser;
 import com.trinhthanhnam.mysocialapp.model.Chat;
 import com.trinhthanhnam.mysocialapp.model.User;
 import com.trinhthanhnam.mysocialapp.notifications.APIService;
@@ -82,8 +80,8 @@ import retrofit2.Callback;
 public class ChatActivity extends AppCompatActivity {
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ImageButton btn_send, attachBtn, callIvbtn, videoCallIvbtn;
-    ImageView profileIv;
+    ImageButton btn_send, attachBtn;
+    ImageView profileIv,blockIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
 
@@ -99,6 +97,7 @@ public class ChatActivity extends AppCompatActivity {
     String hisuid;
     String myUid;
     String hisImage;
+    boolean isBlocked = false;
     Uri uriImage = null;
 
     APIService apiService;
@@ -130,8 +129,7 @@ public class ChatActivity extends AppCompatActivity {
         messageEt = findViewById(R.id.messageEt);
         btn_send = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
-        callIvbtn = findViewById(R.id.callIvbtn);
-        videoCallIvbtn = findViewById(R.id.videoCallIvbtn);
+        blockIv = findViewById(R.id.blockIv);
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -176,14 +174,10 @@ public class ChatActivity extends AppCompatActivity {
                             userStatusTv.setText(onlineStatus);
                         }else{
                             //convert time stamp to dd/mm/yyyy hh:mm am/pm
-//                            Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-//                            cal.setTimeInMillis(Long.parseLong(onlineStatus));
-//                            String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
-//                            userStatusTv.setText("Last seen at: "+dateTime);
-
-                            long onlineStatusTime = Long.parseLong(onlineStatus);
-                            String timeAgo = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
-                            userStatusTv.setText("Last seen: " + timeAgo);
+                            Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+                            cal.setTimeInMillis(Long.parseLong(onlineStatus));
+                            String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
+                            userStatusTv.setText("Last seen at: "+dateTime);
                         }
                     }
 
@@ -197,21 +191,6 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        callIvbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = nameTv.getText().toString();
-                System.out.println("Call to: " + name);
-            }
-        });
-
-        videoCallIvbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
             }
         });
@@ -259,9 +238,99 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+        blockIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isBlocked){
+                    unBlockUser();
+                }else{
+                    blockUser();
+                }
+            }
+        });
 
         readMessage();
+        checkIsBlocked();
         seenMessage();
+
+    }
+    private void checkIsBlocked() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(firebaseAuth.getUid()).child("BlockedUsers").orderByChild("uid").equalTo(hisuid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()){
+                            if(ds.exists()){
+                                blockIv.setImageResource(R.drawable.ic_blocked);
+                                isBlocked = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void blockUser() {
+        //block the user , by addding uid to current user's "BlockedUsers" node
+
+        //put values in hashmap to put in db
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("uid",hisuid);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(myUid).child("BlockedUsers").child(hisuid).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(ChatActivity.this, "Block Successfully...", Toast.LENGTH_SHORT).show();
+                        blockIv.setImageResource(R.drawable.ic_blocked);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ChatActivity.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void unBlockUser() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(myUid).child("BlockedUsers").orderByChild("uid").equalTo(hisuid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()){
+                            if(ds.exists()){
+                                ds.getRef().removeValue()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Toast.makeText(ChatActivity.this, "Unblocked Successfully...", Toast.LENGTH_SHORT).show();
+                                                blockIv.setImageResource(R.drawable.ic_unblocked);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(ChatActivity.this, "Failed: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
     }
 

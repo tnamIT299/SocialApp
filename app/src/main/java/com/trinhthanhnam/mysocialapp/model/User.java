@@ -3,8 +3,12 @@ package com.trinhthanhnam.mysocialapp.model;
 public class User {
 
     String name , email , search , phone , image , cover,uid, onlineStatus, typingTo;
+    boolean isBlocked = false;
 
-    public User(String name, String email, String search, String phone, String image, String cover, String uid, String onlineStatus, String typingTo) {
+    public User() {
+    }
+
+    public User(String name, String email, String search, String phone, String image, String cover, String uid, String onlineStatus, String typingTo, boolean isBlocked) {
         this.name = name;
         this.email = email;
         this.search = search;
@@ -14,9 +18,7 @@ public class User {
         this.uid = uid;
         this.onlineStatus = onlineStatus;
         this.typingTo = typingTo;
-    }
-
-    public User() {
+        this.isBlocked = isBlocked;
     }
 
     public String getName() {
@@ -89,6 +91,14 @@ public class User {
 
     public void setTypingTo(String typingTo) {
         this.typingTo = typingTo;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 }
 
