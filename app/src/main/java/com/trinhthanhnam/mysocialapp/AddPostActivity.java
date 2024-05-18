@@ -94,6 +94,16 @@ public class AddPostActivity extends AppCompatActivity {
 
         //get data through intent from previous activities
         Intent intent = getIntent();
+
+        String action = intent.getAction();
+        String type = intent.getType();
+        if(Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                handleSendText(intent); // Handle text being sent
+            } else if (type.startsWith("image/")) {
+                handleSendImage(intent); // Handle single image being sent
+            }
+        }
         String isUpdateKey = ""+intent.getStringExtra("key");
         String edtPostId = ""+intent.getStringExtra("editPostId");
         //validate if we came here to update post
@@ -162,6 +172,21 @@ public class AddPostActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void handleSendImage(Intent intent) {
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+                uriImage = imageUri;
+                imageIv.setImageURI(imageUri);
+            }
+        }
+
+    private void handleSendText(Intent intent) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            descriptionEt.setText(sharedText);
+        }
     }
 
     private void beginUpdate(String title, String description, String edtPostId) {
