@@ -116,19 +116,26 @@ public class DashboardActivity extends AppCompatActivity {
                ft5.replace(R.id.container, chatFragment,"");
                ft5.commit();
                return true;
+           } else if (menuItem.getItemId() == R.id.nav_noti) {
+               NotificationFragment notiFragment = new NotificationFragment();
+               FragmentTransaction ft6 = getSupportFragmentManager().beginTransaction();
+               ft6.replace(R.id.container, notiFragment,"");
+               ft6.commit();
+               return true;
            } else if (menuItem.getItemId() == R.id.nav_user){
                UsersFragment usersFragment = new UsersFragment();
                FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
                ft3.replace(R.id.container, usersFragment,"");
                ft3.commit();
                return true;
-           }else if (menuItem.getItemId() == R.id.nav_mutilChoice){
-               OptionFragment optionFragment = new OptionFragment();
-               FragmentTransaction ft4 = getSupportFragmentManager().beginTransaction();
-               ft4.replace(R.id.container, optionFragment,"");
-               ft4.commit();
-               return true;
            }
+//           else if (menuItem.getItemId() == R.id.nav_setting){
+//               OptionFragment optionFragment = new OptionFragment();
+//               FragmentTransaction ft4 = getSupportFragmentManager().beginTransaction();
+//               ft4.replace(R.id.container, optionFragment,"");
+//               ft4.commit();
+//               return true;
+//           }
             return false;
         }
     };
@@ -137,7 +144,7 @@ public class DashboardActivity extends AppCompatActivity {
         //get current user
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if(user!=null){
-                //set email of logged in user
+            //set email of logged in user
            // txt_proFile.setText(user.getEmail());
             mUID = user.getUid();
             SharedPreferences sp = getSharedPreferences("SP_USER",MODE_PRIVATE);

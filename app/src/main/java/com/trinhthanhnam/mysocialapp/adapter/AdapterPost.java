@@ -156,6 +156,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
                                 postsRef.child(postIde).child("pLikes").setValue(""+(pLikes+1));
                                 likesRef.child(postIde).child(myUid).setValue("Liked");
                                 mProcessLike = false;
+                                addToHisNotifications(""+uid, ""+pId, "liked your post");
                             }
                         }
                     }
@@ -234,6 +235,30 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         return uri;
+    }
+
+    private void addToHisNotifications(String hisUid, String pId, String notification){
+        String timestamp = ""+System.currentTimeMillis();
+        HashMap<Object, String> hashMap = new HashMap<>();
+        hashMap.put("pId", pId);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("pUid", hisUid);
+        hashMap.put("notification", notification);
+        hashMap.put("sUid", myUid);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(hisUid).child("Notifications").child(timestamp).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
     }
 
     private void shareTextOnly(String pTitle, String pDescr) {

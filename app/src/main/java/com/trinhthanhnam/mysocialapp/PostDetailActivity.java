@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,16 +93,12 @@ public class PostDetailActivity extends AppCompatActivity {
         setLikes();
         loadComments();
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                postComment();
-            }
-        });
+
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 likePost();
+                addToHisNotifications(""+hisUid,""+postId,"Liked your post");
             }
         });
         btnMore.setOnClickListener(new View.OnClickListener() {
@@ -169,6 +166,30 @@ public class PostDetailActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
         intent.putExtra(Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+
+    private void addToHisNotifications(String hisUid, String pId, String notification){
+        String timestamp = ""+System.currentTimeMillis();
+        HashMap<Object, String> hashMap = new HashMap<>();
+        hashMap.put("pId", pId);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("pUid", hisUid);
+        hashMap.put("notification", notification);
+        hashMap.put("sUid", myUid);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.child(hisUid).child("Notifications").child(timestamp).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
     }
 
     private void loadComments() {
@@ -324,6 +345,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         postsRef.child(postId).child("pLikes").setValue(""+(Integer.parseInt(pLikes)+1));
                         likesRef.child(postId).child(myUid).setValue("Liked");
                         mProcessLike = false;
+
                     }
                 }
             }
@@ -365,8 +387,10 @@ public class PostDetailActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         pd.dismiss();
                         Toast.makeText(PostDetailActivity.this, "Comment Added...", Toast.LENGTH_SHORT).show();
+                        addToHisNotifications(""+ hisUid,""+ postId,"Commented on your post");
                         edtComment.setText("");
                         updateCommentCount();
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -444,6 +468,15 @@ public class PostDetailActivity extends AppCompatActivity {
                     Calendar calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
                     String pTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+
+                    //send cmt
+                    btnSend.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            postComment();
+                            addToHisNotifications(""+hisUid,""+postId,"comment on your post");;
+                        }
+                    });
 
                     //set data
                     postTitleTv.setText(pTitle);
