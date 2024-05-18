@@ -42,6 +42,7 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.AddPostActivity;
 import com.trinhthanhnam.mysocialapp.PostDetailActivity;
+import com.trinhthanhnam.mysocialapp.PostLikedByActivity;
 import com.trinhthanhnam.mysocialapp.R;
 import com.trinhthanhnam.mysocialapp.ThereProfileActivity;
 import com.trinhthanhnam.mysocialapp.model.Post;
@@ -198,6 +199,15 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             public void onClick(View v) {
                 Intent intent = new Intent(context, ThereProfileActivity.class);
                 intent.putExtra("uid", uid);
+                context.startActivity(intent);
+            }
+        });
+
+        holder.pLikesTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, PostLikedByActivity.class);
+                intent.putExtra("postId", pId);
                 context.startActivity(intent);
             }
         });

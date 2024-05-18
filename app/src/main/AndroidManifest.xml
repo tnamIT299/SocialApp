@@ -12,16 +12,19 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".MyAppliaction"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/logo"
-        android:name=".MyAppliaction"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MySocialApp"
         tools:targetApi="31">
+        <activity
+            android:name=".PostLikedByActivity"
+            android:exported="false" />
         <activity
             android:name=".PostDetailActivity"
             android:exported="false" />
@@ -36,16 +39,19 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ChatActivity"
             android:exported="false" />
@@ -85,11 +91,9 @@
             </intent-filter>
         </service>
 
-
-
         <provider
-            android:authorities="com.trinhthanhnam.mysocialapp.fileprovider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.trinhthanhnam.mysocialapp.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

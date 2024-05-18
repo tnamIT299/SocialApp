@@ -477,6 +477,14 @@ public class PostDetailActivity extends AppCompatActivity {
                             addToHisNotifications(""+hisUid,""+postId,"comment on your post");;
                         }
                     });
+                    postLikeTv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(PostDetailActivity.this, PostLikedByActivity.class);
+                            intent.putExtra("postId",postId);
+                            startActivity(intent);
+                        }
+                    });
 
                     //set data
                     postTitleTv.setText(pTitle);
