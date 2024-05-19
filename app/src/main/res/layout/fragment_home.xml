@@ -1,56 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeFragment"
     android:orientation="vertical">
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/lavender"
-        android:weightSum="10">
-
-        <TextView
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/searchEdt"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Loopy"
-            android:textSize="50sp"
-            android:backgroundTint="@color/lavender"
-            android:layout_weight="9.5"
-            >
-        </TextView>
+            android:hint="Search"
+            android:padding="10dp"
+            android:background="@drawable/editextstyle"
+            android:layout_margin="10dp">
 
-        <ImageButton
-            android:id="@+id/imBtn_addPost"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/baseline_add_circle_outline_24"
-            android:scaleType="fitXY"
-            android:layout_gravity="center"
-            android:background="@color/lavender"
-            android:layout_weight="0.5"
-            >
-        </ImageButton>
+        </EditText>
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/searchEdt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search"
-        android:padding="10dp"
-        android:background="@drawable/editextstyle"
-        android:layout_margin="10dp">
-
-    </EditText>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/postRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp">
     </androidx.recyclerview.widget.RecyclerView>
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/post_add_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/baseline_add_24"
+        android:layout_alignParentRight="true"
+        android:background="#08E648"/>
+
+</RelativeLayout>

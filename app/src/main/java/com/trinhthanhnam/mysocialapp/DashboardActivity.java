@@ -136,9 +136,9 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void showMoreOptions() {
         PopupMenu popupMenu = new PopupMenu(this, navigationView , Gravity.END);
-        popupMenu.getMenu().add(Menu.NONE,0,0,"Notifications");
-        popupMenu.getMenu().add(Menu.NONE,1,0,"Group Chats");
-        popupMenu.getMenu().add(Menu.NONE,2,0,"Settings");
+        popupMenu.getMenu().add(Menu.NONE,0,0,"Notifications").setIcon(R.drawable.baseline_notifications_24);
+        popupMenu.getMenu().add(Menu.NONE,1,0,"Group Chats").setIcon(R.drawable.baseline_groups_24);
+        popupMenu.getMenu().add(Menu.NONE,2,0,"Settings").setIcon(R.drawable.baseline_manage_accounts_24);
 
         //click
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

@@ -311,11 +311,11 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.child(postId).hasChild(myUid)){
-                    btnLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_liked,0,0,0);
-                    btnLike.setText("Liked");
-                }else{
                     btnLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.like,0,0,0);
                     btnLike.setText("Liked");
+                }else{
+                    btnLike.setCompoundDrawablesWithIntrinsicBounds(R.drawable.notlike,0,0,0);
+                    btnLike.setText("Like");
                 }
             }
 
@@ -345,7 +345,9 @@ public class PostDetailActivity extends AppCompatActivity {
                         postsRef.child(postId).child("pLikes").setValue(""+(Integer.parseInt(pLikes)+1));
                         likesRef.child(postId).child(myUid).setValue("Liked");
                         mProcessLike = false;
-
+                        if (!myUid.equals(hisUid)) {
+                            addToHisNotifications(""+ hisUid,""+ postId,"Liked your post");
+                        }
                     }
                 }
             }
@@ -474,7 +476,9 @@ public class PostDetailActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             postComment();
-                            addToHisNotifications(""+hisUid,""+postId,"comment on your post");;
+                            if (!myUid.equals(hisUid)) {
+                                addToHisNotifications(""+hisUid,""+postId,"comment on your post");
+                            }
                         }
                     });
                     postLikeTv.setOnClickListener(new View.OnClickListener() {

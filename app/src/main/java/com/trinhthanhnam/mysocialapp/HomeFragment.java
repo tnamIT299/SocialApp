@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
     RecyclerView recyclerView;
     List<Post> postList;
     AdapterPost adapterPost;
+    FloatingActionButton post_add_fab;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,7 +101,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         //init
-        addPostBtn = view.findViewById(R.id.imBtn_addPost);
+        post_add_fab = view.findViewById(R.id.post_add_fab);
         recyclerView = view.findViewById(R.id.postRecyclerView);
         searchEdt = view.findViewById(R.id.searchEdt);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -111,7 +113,7 @@ public class HomeFragment extends Fragment {
         postList = new ArrayList<>();
         loadapterPost();
 
-        addPostBtn.setOnClickListener(new View.OnClickListener() {
+        post_add_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), AddPostActivity.class));

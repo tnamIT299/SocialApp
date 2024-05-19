@@ -3,6 +3,7 @@ package com.trinhthanhnam.mysocialapp.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,9 +63,8 @@ public class AdapterComment extends RecyclerView.Adapter<AdapterComment.MyHolder
 
 
         // convert timestamp to dd/mm/yyyy hh:mm am/pm
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        calendar.setTimeInMillis(Long.parseLong(timeStamp));
-        String pTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+        long onlineStatusTime = Long.parseLong(timeStamp);
+        String pTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
 
         // set the data
         holder.nameTv.setText(name);

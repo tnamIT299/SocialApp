@@ -132,9 +132,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="12sp"
-                android:drawableLeft="@drawable/like"
+                android:drawableLeft="@drawable/notlike"
                 android:drawablePadding="5dp"
-                android:backgroundTint="#A89E9E"
+                android:backgroundTint="@color/lavender"
                 android:text="Like">
             </Button>
 
@@ -146,7 +146,7 @@
                 android:textSize="12sp"
                 android:drawableLeft="@drawable/comment"
                 android:drawablePadding="5dp"
-                android:backgroundTint="#A89E9E"
+                android:backgroundTint="@color/lavender"
                 android:text="Comment">
             </Button>
 
@@ -158,7 +158,7 @@
                 android:textSize="12sp"
                 android:drawableLeft="@drawable/share"
                 android:drawablePadding="5dp"
-                android:backgroundTint="#A89E9E"
+                android:backgroundTint="@color/lavender"
                 android:text="Share">
             </Button>
 

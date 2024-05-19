@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/white"
+    app:contentPadding="10dp"
+    android:layout_marginTop="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/groupIconIv"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/baseline_groups_24">
+
+        </com.mikhaellopez.circularimageview.CircularImageView>
+
+        <TextView
+            android:id="@+id/groupNameTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_toEndOf="@+id/groupIconIv"
+            android:textSize="20dp"
+            android:text="Group Name"
+            android:textColor="@color/black">
+        </TextView>
+
+        <TextView
+            android:id="@+id/senderNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/groupIconIv"
+            android:layout_below="@+id/groupNameTv"
+            android:layout_marginStart="4dp"
+            android:text="Sender Name : "
+            android:textColor="@color/black">
+        </TextView>
+
+        <TextView
+            android:id="@+id/messageTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/senderNameTv"
+            android:layout_below="@+id/groupNameTv"
+            android:layout_marginStart="4dp"
+            android:text="The message"
+            android:singleLine="true"
+            android:textColor="@color/black">
+        </TextView>
+
+        <TextView
+            android:id="@+id/timeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/senderNameTv"
+            android:layout_marginStart="4dp"
+            android:text="Time"
+            android:textColor="@color/black">
+        </TextView>
+
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

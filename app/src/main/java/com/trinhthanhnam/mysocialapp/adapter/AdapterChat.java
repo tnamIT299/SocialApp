@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,9 +72,9 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
         String timeStamp = chatList.get(position).getTimestamp();
         String type = chatList.get(position).getType();
         //convert time stamp to dd/mm/yyyy hh:mm am/pm
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(Long.parseLong(timeStamp));
-        String dateTime = android.text.format.DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
+
+        long onlineStatusTime = Long.parseLong(timeStamp);
+        String dateTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
          if(type.equals("text")) {
              //text message
              holder.messageTv.setVisibility(View.VISIBLE);

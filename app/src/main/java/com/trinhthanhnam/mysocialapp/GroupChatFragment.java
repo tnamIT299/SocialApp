@@ -1,12 +1,30 @@
 package com.trinhthanhnam.mysocialapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterGroupChat;
+import com.trinhthanhnam.mysocialapp.model.GroupChat;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +32,11 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class GroupChatFragment extends Fragment {
+    RecyclerView groupChatRv;
+    FirebaseAuth firebaseAuth;
+    ArrayList<GroupChat> groupChatList;
+    AdapterGroupChat adapterGroupChat;
+    EditText searchGroupEt;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,10 +78,91 @@ public class GroupChatFragment extends Fragment {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_group_chat, container, false);
+
+        groupChatRv = view.findViewById(R.id.groupRv);
+        searchGroupEt = view.findViewById(R.id.edtSearch);
+        firebaseAuth = FirebaseAuth.getInstance();
+        loadGroupChatList();
+        searchGroup();
+        return view;
+    }
+
+    private void searchGroup() {
+        searchGroupEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!TextUtils.isEmpty(s.toString())) {
+                    searchGroupChatList(s.toString());
+                } else {
+                    loadGroupChatList();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void loadGroupChatList() {
+        groupChatList = new ArrayList<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Groups");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                groupChatList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                   if(ds.child("Participants").child(firebaseAuth.getUid()).exists()) {
+                       GroupChat model = ds.getValue(GroupChat.class);
+                       groupChatList.add(model);
+                   }
+                }
+                adapterGroupChat = new AdapterGroupChat(getActivity(), groupChatList);
+                groupChatRv.setAdapter(adapterGroupChat);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void searchGroupChatList(String query) {
+        groupChatList = new ArrayList<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Groups");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                groupChatList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    if(ds.child("Participants").child(firebaseAuth.getUid()).exists()) {
+
+                        if (ds.child("groupTitle").toString().toLowerCase().contains(query.toLowerCase())) {
+                            GroupChat model = ds.getValue(GroupChat.class);
+                            groupChatList.add(model);
+                        }
+
+                    }
+                }
+                adapterGroupChat = new AdapterGroupChat(getActivity(), groupChatList);
+                groupChatRv.setAdapter(adapterGroupChat);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
