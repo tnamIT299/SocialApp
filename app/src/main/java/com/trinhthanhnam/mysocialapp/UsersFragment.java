@@ -1,6 +1,7 @@
 package com.trinhthanhnam.mysocialapp;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +43,7 @@ public class UsersFragment extends Fragment {
 
     EditText edtSearch;
     ImageButton imgBtnSearch;
+    FloatingActionButton group_add_fab;
 
     RecyclerView recyclerView;
     AdapterUser adapterUser;
@@ -103,6 +106,15 @@ public class UsersFragment extends Fragment {
          recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
          imgBtnSearch = view.findViewById(R.id.imgBtn_Search);
          edtSearch = view.findViewById(R.id.edtSearch);
+         group_add_fab = view.findViewById(R.id.group_add_fab);
+
+         group_add_fab.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                    //start activity
+                    startActivity(new Intent(getActivity(), GroupCreateActivity.class));
+             }
+         });
 
 
          //init
@@ -127,7 +139,7 @@ public class UsersFragment extends Fragment {
                 for (DataSnapshot ds : snapshot.getChildren()){
                     User user = ds.getValue(User.class);
                     //get all users except currently signed in user
-                    if (!user.getUid().equals(fUser.getUid())){
+                    if (user != null && fUser != null && user.getUid() != null && !user.getUid().equals(fUser.getUid())){
                         userList.add(user);
                     }
                     //adapter

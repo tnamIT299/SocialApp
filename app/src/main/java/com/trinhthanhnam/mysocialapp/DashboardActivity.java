@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,7 @@ public class DashboardActivity extends AppCompatActivity {
     TextView txt_proFile;
     String mUID;
     private AlertDialog alertDialog;
+    BottomNavigationView navigationView;
 
 
     @SuppressLint("MissingInflatedId")
@@ -43,7 +46,7 @@ public class DashboardActivity extends AppCompatActivity {
        // txt_proFile=findViewById(R.id.txt_profile);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation);
+         navigationView = findViewById(R.id.bottom_navigation);
         navigationView.setOnNavigationItemSelectedListener(selectedListener);
 
         HomeFragment homeFragment = new HomeFragment();
@@ -116,29 +119,57 @@ public class DashboardActivity extends AppCompatActivity {
                ft5.replace(R.id.container, chatFragment,"");
                ft5.commit();
                return true;
-           } else if (menuItem.getItemId() == R.id.nav_noti) {
-               NotificationFragment notiFragment = new NotificationFragment();
-               FragmentTransaction ft6 = getSupportFragmentManager().beginTransaction();
-               ft6.replace(R.id.container, notiFragment,"");
-               ft6.commit();
-               return true;
-           } else if (menuItem.getItemId() == R.id.nav_user){
+           }
+           else if (menuItem.getItemId() == R.id.nav_user){
                UsersFragment usersFragment = new UsersFragment();
                FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
                ft3.replace(R.id.container, usersFragment,"");
                ft3.commit();
                return true;
            }
-//           else if (menuItem.getItemId() == R.id.nav_setting){
-//               OptionFragment optionFragment = new OptionFragment();
-//               FragmentTransaction ft4 = getSupportFragmentManager().beginTransaction();
-//               ft4.replace(R.id.container, optionFragment,"");
-//               ft4.commit();
-//               return true;
-//           }
+           else if (menuItem.getItemId() == R.id.nav_mutilChoice){
+               showMoreOptions();
+           }
             return false;
         }
     };
+
+    private void showMoreOptions() {
+        PopupMenu popupMenu = new PopupMenu(this, navigationView , Gravity.END);
+        popupMenu.getMenu().add(Menu.NONE,0,0,"Notifications");
+        popupMenu.getMenu().add(Menu.NONE,1,0,"Group Chats");
+        popupMenu.getMenu().add(Menu.NONE,2,0,"Settings");
+
+        //click
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if(id == 0) {
+                    //Notifications
+                    NotificationFragment notiFragment = new NotificationFragment();
+                   FragmentTransaction ft6 = getSupportFragmentManager().beginTransaction();
+                   ft6.replace(R.id.container, notiFragment,"");
+                   ft6.commit();
+                } else if(id == 1){
+                    //Group Chats
+                    GroupChatFragment groupChatFragment = new GroupChatFragment();
+                    FragmentTransaction ft7 = getSupportFragmentManager().beginTransaction();
+                    ft7.replace(R.id.container, groupChatFragment,"");
+                    ft7.commit();
+                }
+                else if(id == 2){
+                    //Settings
+                    OptionFragment optionFragment = new OptionFragment();
+                    FragmentTransaction ft8 = getSupportFragmentManager().beginTransaction();
+                    ft8.replace(R.id.container, optionFragment,"");
+                    ft8.commit();
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
 
     private void checkUserstatus(){
         //get current user

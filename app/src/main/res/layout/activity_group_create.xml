@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GroupCreateActivity"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/groupIcon"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/baseline_group_add_24">
+    </com.mikhaellopez.circularimageview.CircularImageView>
+
+    <EditText
+        android:id="@+id/edt_GroupName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Group Name"
+        android:layout_below="@+id/groupIcon"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:background="@color/white">
+
+    </EditText>
+
+
+    <EditText
+        android:id="@+id/edt_Description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine|textCapSentences"
+        android:minHeight="100dp"
+        android:gravity="top"
+        android:hint="Description"
+        android:padding="10dp"
+        android:layout_below="@+id/edt_GroupName"
+        android:layout_marginTop="20dp"
+        android:background="@color/white">
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_CreateGroup"
+        android:layout_width="200dp"
+        android:backgroundTint="@color/lavender"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_below="@id/edt_Description"
+        android:layout_centerHorizontal="true"
+        android:text="Create"/>
+
+
+</RelativeLayout>

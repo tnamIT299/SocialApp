@@ -16,11 +16,11 @@
         android:title="Chat"
         android:icon="@drawable/baseline_chat_24"/>
 
-    <item android:id="@+id/nav_noti"
-        android:title="Notification"
-        android:icon="@drawable/baseline_notifications_24"/>
+<!--    <item android:id="@+id/nav_noti"-->
+<!--        android:title="Notification"-->
+<!--        android:icon="@drawable/baseline_notifications_24"/>-->
 
-<!--    <item android:id="@+id/nav_mutilChoice"-->
-<!--        android:title="Options"-->
-<!--        android:icon="@drawable/baseline_density_medium_24"/>-->
+    <item android:id="@+id/nav_mutilChoice"
+        android:title="More"
+        android:icon="@drawable/baseline_density_medium_24"/>
 </menu>
