@@ -1,6 +1,7 @@
 package com.trinhthanhnam.mysocialapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.trinhthanhnam.mysocialapp.GroupChatActivity;
 import com.trinhthanhnam.mysocialapp.R;
 import com.trinhthanhnam.mysocialapp.model.GroupChat;
 
@@ -52,7 +54,9 @@ public class AdapterGroupChat extends RecyclerView.Adapter<AdapterGroupChat.MyHo
             @Override
             public void onClick(View v) {
                 //open group chat
-
+                Intent intent = new Intent(context, GroupChatActivity.class);
+                intent.putExtra("groupId",groupId);
+                context.startActivity(intent);
             }
         });
     }

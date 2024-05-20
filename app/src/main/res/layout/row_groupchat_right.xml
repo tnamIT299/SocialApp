@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_sender"
+    android:layout_marginStart="100dp"
+    android:layout_marginTop="10dp"
+    android:padding="10dp">
+    <TextView
+        android:id="@+id/nameTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:textColor="@color/lavender"
+        android:text="Name"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/messageTv"
+        android:layout_below="@id/nameTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/black"
+        android:text="The message" />
+    <TextView
+        android:id="@+id/timeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="Time"
+        android:layout_below="@id/messageTv"
+        android:layout_marginEnd="5dp"
+        android:textSize="12sp"/>
+</RelativeLayout>
