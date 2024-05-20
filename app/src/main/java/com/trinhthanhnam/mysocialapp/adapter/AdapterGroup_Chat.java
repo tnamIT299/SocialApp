@@ -59,8 +59,8 @@ public class AdapterGroup_Chat extends RecyclerView.Adapter<AdapterGroup_Chat.Ho
         String timeStamp = model.getTimeStamp();
         String senderUid = model.getSender();
 
-        long onlineStatusTime = Long.parseLong(timeStamp);
-        String dateTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+        long senderTime = Long.parseLong(timeStamp);
+        String dateTime = (String) DateUtils.getRelativeTimeSpanString(senderTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
         holder.messageTv.setText(message);
         holder.timeTv.setText(dateTime);
         setUserName(model,holder);

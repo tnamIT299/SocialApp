@@ -40,11 +40,11 @@ import java.util.HashMap;
 
 public class GroupChatActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
-    private String groupId;
+    private String groupId,myGroupRole="";
     private Toolbar toolBar;
     private ImageView groupIconIv;
     private TextView groupTitleTv;
-    private ImageButton attachBtn,sendBtn;
+    private ImageButton attachBtn,sendBtn,addBtn;
     private EditText messageEt;
     private RecyclerView chatRcv;
     private ArrayList<Group_Chat> groupChatList;
@@ -59,8 +59,10 @@ public class GroupChatActivity extends AppCompatActivity {
         groupTitleTv = findViewById(R.id.groupTitleTv);
         attachBtn = findViewById(R.id.attachBtn);
         sendBtn = findViewById(R.id.sendBtn);
+        addBtn = findViewById(R.id.addBtn);
         messageEt = findViewById(R.id.messageEt);
         chatRcv = findViewById(R.id.chatRcv);
+
         //get id of the group
         Intent intent = getIntent();
         groupId = intent.getStringExtra("groupId");
@@ -68,6 +70,7 @@ public class GroupChatActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         loadGroupInfo();
         loadGroupMessage();
+        loadMyGroupRole();
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +86,39 @@ public class GroupChatActivity extends AppCompatActivity {
                 messageEt.setText("");
             }
         });
+        addBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupChatActivity.this, GroupParticipantAddActivity.class);
+                intent.putExtra("groupId",groupId);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void loadMyGroupRole() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Groups");
+        ref.child(groupId).child("Participants")
+                .orderByChild("uid").equalTo(firebaseAuth.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()){
+                            myGroupRole = ""+ds.child("role").getValue();
+                            if(myGroupRole.equals("creator")|| myGroupRole.equals("admin")){
+                                addBtn.setVisibility(View.VISIBLE);
+                            }else{
+                                addBtn.setVisibility(View.GONE);
+                            }
+                            Log.i("myGroupRole",myGroupRole);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadGroupMessage() {
