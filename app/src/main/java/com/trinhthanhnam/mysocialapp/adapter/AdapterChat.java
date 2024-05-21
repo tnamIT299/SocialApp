@@ -75,6 +75,8 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
 
         long onlineStatusTime = Long.parseLong(timeStamp);
         String dateTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+
+        //set data
          if(type.equals("text")) {
              //text message
              holder.messageTv.setVisibility(View.VISIBLE);
@@ -87,8 +89,6 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
                 Glide.with(context).load(message).into(holder.messageIv);
          }
 
-        //set data
-        holder.messageTv.setText(message);
         holder.timeTv.setText(dateTime);
         try{
             Picasso.get().load(imageUrl).into(holder.profileIv);

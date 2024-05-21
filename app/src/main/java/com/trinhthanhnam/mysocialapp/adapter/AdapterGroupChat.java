@@ -82,10 +82,15 @@ public class AdapterGroupChat extends RecyclerView.Adapter<AdapterGroupChat.MyHo
                             String message = ""+ds.child("message").getValue();
                             String timeStamp = ""+ds.child("timeStamp").getValue();
                             String sender = ""+ds.child("sender").getValue();
+                            String type = ""+ds.child("type").getValue();
 
                             long senderTime = Long.parseLong(timeStamp);
                             String dateTime = (String) DateUtils.getRelativeTimeSpanString(senderTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
-                            holder.messageTv.setText(message);
+                            if(type.equals("image")){
+                                holder.messageTv.setText("Sent Photo");
+                            }else{
+                                holder.messageTv.setText(message);
+                            }
                             holder.timeTv.setText(dateTime);
                             //get info of last sender
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");

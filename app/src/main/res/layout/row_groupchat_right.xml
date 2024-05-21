@@ -23,13 +23,21 @@
         android:layout_marginBottom="5dp"
         android:textColor="@color/black"
         android:text="The message" />
+    <ImageView
+        android:id="@+id/messageIv"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/messageTv"
+        android:src="@drawable/baseline_image_24"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_sender"/>
     <TextView
         android:id="@+id/timeTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:text="Time"
-        android:layout_below="@id/messageTv"
+        android:layout_below="@id/messageIv"
         android:layout_marginEnd="5dp"
         android:textSize="12sp"/>
 </RelativeLayout>
