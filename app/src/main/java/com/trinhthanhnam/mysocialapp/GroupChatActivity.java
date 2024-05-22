@@ -62,7 +62,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private Toolbar toolBar;
     private ImageView groupIconIv;
     private TextView groupTitleTv;
-    private ImageButton attachBtn,sendBtn,addBtn;
+    private ImageButton attachBtn,sendBtn,addBtn,infoBtn;
     private EditText messageEt;
     private RecyclerView chatRcv;
     private ArrayList<Group_Chat> groupChatList;
@@ -89,6 +89,7 @@ public class GroupChatActivity extends AppCompatActivity {
         attachBtn = findViewById(R.id.attachBtn);
         sendBtn = findViewById(R.id.sendBtn);
         addBtn = findViewById(R.id.addBtn);
+        infoBtn = findViewById(R.id.infoBtn);
         messageEt = findViewById(R.id.messageEt);
         chatRcv = findViewById(R.id.chatRcv);
 
@@ -131,6 +132,14 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showImagePickDialog();
+            }
+        });
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+                intent.putExtra("groupId",groupId);
+                startActivity(intent);
             }
         });
     }

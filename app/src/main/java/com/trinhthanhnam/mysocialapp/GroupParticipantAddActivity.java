@@ -37,23 +37,16 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_participant_add);
         Toolbar toolbar = findViewById(R.id.toolBar);
-        if (toolbar == null) {
-            Log.e("GroupParticipantAddActivity", "Toolbar is null");
-        } else {
-            setSupportActionBar(toolbar);
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle("Add Participants");
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setDisplayShowHomeEnabled(true);
-            } else {
-                Log.e("GroupParticipantAddActivity", "ActionBar is null");
-            }
-        }
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("Add Participants");
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (actionBar != null) {
+            actionBar.setTitle("Group Info");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        } else {
+            Log.e("GroupInfoActivity", "ActionBar is null in onCreate");
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         usersRv = findViewById(R.id.usersRv);
@@ -97,7 +90,7 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
                     String groupTitle = ""+ds.child("groupTitle").getValue();
                     String groupDescription = ""+ds.child("groupDescription").getValue();
                     String groupIcon = ""+ds.child("groupIcon").getValue();
-                    String createdBy = ""+ds.child("createdBy").getValue();
+                    String createdBy = ""+ds.child("createBy").getValue();
                     String timestamp = ""+ds.child("timestamp").getValue();
                     actionBar.setTitle("Add Participants");
                     ref1.child(groupId).child("Participants").child(firebaseAuth.getUid())

@@ -36,17 +36,27 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:layout_marginStart="20dp"
-                android:layout_weight="0.7"
+                android:layout_weight="0.8"
                 android:textStyle="bold"/>
         <ImageButton
             android:id="@+id/addBtn"
-            android:layout_width="30dp"
+            android:layout_width="40dp"
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"
             android:backgroundTint="@color/lavender"
             android:layout_weight="0.1"
-            android:layout_marginEnd="40dp"
+            android:layout_marginEnd="20dp"
             android:src="@drawable/ic_addperson"
+            />
+        <ImageButton
+            android:id="@+id/infoBtn"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:backgroundTint="@color/lavender"
+            android:layout_weight="0.1"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_info"
             />
     </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
