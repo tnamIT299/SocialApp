@@ -278,19 +278,6 @@ public class ChatActivity extends AppCompatActivity {
         });
 
 
-//        blockIv.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (isBlocked){
-//                    unBlockUser();
-//                    typingLayout.setVisibility(View.VISIBLE);
-//                }else{
-//                    blockUser();
-//                    typingLayout.setVisibility(View.GONE);
-//                }
-//            }
-//        });
-
         readMessage();
         checkIsBlocked();
         seenMessage();
@@ -509,9 +496,6 @@ public class ChatActivity extends AppCompatActivity {
     private void sendImageMessage(Uri uriImage) throws IOException {
         notify = true;
 
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Sending image...");
-        progressDialog.show();
         String timeStamp = ""+System.currentTimeMillis();
         String fileNameAndPath = "ChatImages/" + "post_" + timeStamp;
         //getBitmap from image uri
@@ -523,7 +507,6 @@ public class ChatActivity extends AppCompatActivity {
         ref.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                progressDialog.dismiss();
                 //get url of uploaded image
                 Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                 while (!uriTask.isSuccessful());
@@ -595,7 +578,7 @@ public class ChatActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                progressDialog.dismiss();
+                Toast.makeText(ChatActivity.this, "Fail to send image", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -169,8 +169,6 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
                 for(DataSnapshot ds: snapshot.getChildren()){
                     if(ds.child("sender").getValue().equals(myUID)){
 
-                        //remove the message from chats
-                        //ds.getRef().removeValue();
 
                         //set message "This message was deleted..."
                         HashMap<String, Object> hashMap = new HashMap<>();

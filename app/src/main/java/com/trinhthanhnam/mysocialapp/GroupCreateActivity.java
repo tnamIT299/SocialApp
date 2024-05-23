@@ -83,6 +83,9 @@ public class GroupCreateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 creatingGroup();
+                Intent intent = new Intent(GroupCreateActivity.this, DashboardActivity.class);
+                intent.putExtra("showGroupFragment", true);
+                startActivity(intent);
             }
         });
 

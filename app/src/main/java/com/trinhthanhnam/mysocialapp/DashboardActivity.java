@@ -42,17 +42,28 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        // Check if we need to show GroupFragment
+        boolean showGroupFragment = getIntent().getBooleanExtra("showGroupFragment", false);
+        System.out.println("showGroupFragment: " + showGroupFragment);
+        if (showGroupFragment) {
+            // Replace your container with GroupFragment
+            GroupChatFragment groupChatFragment = new GroupChatFragment();
+            FragmentTransaction ft7 = getSupportFragmentManager().beginTransaction();
+            ft7.replace(R.id.container, groupChatFragment,"");
+            ft7.commit();
+        }else{
+            HomeFragment homeFragment = new HomeFragment();
+            FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
+            ft1.replace(R.id.container, homeFragment,"");
+            ft1.commit();
+        }
+
         //init
        // txt_proFile=findViewById(R.id.txt_profile);
         firebaseAuth = FirebaseAuth.getInstance();
 
-         navigationView = findViewById(R.id.bottom_navigation);
+        navigationView = findViewById(R.id.bottom_navigation);
         navigationView.setOnNavigationItemSelectedListener(selectedListener);
-
-        HomeFragment homeFragment = new HomeFragment();
-        FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-        ft1.replace(R.id.container, homeFragment,"");
-        ft1.commit();
 
         checkUserstatus();
 

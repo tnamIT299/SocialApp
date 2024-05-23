@@ -162,8 +162,9 @@ public class GroupInfoActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(GroupInfoActivity.this, "Group successfully deleted ...", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(GroupInfoActivity.this,DashboardActivity.class));
-                        finish();
+                        Intent intent = new Intent(GroupInfoActivity.this,DashboardActivity.class);
+                        intent.putExtra("showGroupFragment", true);
+                        startActivity(intent);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
