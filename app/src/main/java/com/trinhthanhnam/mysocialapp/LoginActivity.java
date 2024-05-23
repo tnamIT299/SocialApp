@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         progressDialog= new ProgressDialog(this);
-        progressDialog.setTitle("Đang đăng nhập....");
+        progressDialog.setTitle("Logging....");
     }
 
     private void signIn() {
@@ -135,11 +135,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showRecoverDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Khôi phục mật khẩu");
+        builder.setTitle("Recover Password");
         //set layout linear layout
         LinearLayout linearLayout = new LinearLayout(this);
         EditText email = new EditText(this);
-        email.setHint("Nhập email để khôi phục....");
+        email.setHint("Enter your email to recover ....");
         String emailGet = email.getText().toString().trim();
         email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         email.setMinEms(16);
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
         linearLayout.setPadding(10, 10 , 10 , 10);
 
         builder.setView(linearLayout);
-        builder.setPositiveButton("Khôi phục", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Recover", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 beginRecovery(email.getText().toString().trim());
@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //btn_cancel
-        builder.setNegativeButton("Huỷ", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -166,17 +166,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void beginRecovery(String email) {
-        progressDialog.setTitle("Đang gửi email");
+        progressDialog.setTitle("Sending email...");
         progressDialog.show();
         auth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
                     progressDialog.dismiss();
-                    Toast.makeText(LoginActivity.this, "Gửi email khôi phục thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Send email to recover successfully", Toast.LENGTH_SHORT).show();
                 }else{
                     progressDialog.dismiss();
-                    Toast.makeText(LoginActivity.this, "Thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String pass) {
-        progressDialog.setTitle("Đang đăng nhập....");
+        progressDialog.setTitle("Logging....");
         progressDialog.show();
         auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -203,7 +203,7 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
                 }else{
                     progressDialog.dismiss();
-                    Toast.makeText(LoginActivity.this, "Xác thực thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -223,16 +223,6 @@ public class LoginActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-//        if (requestCode == RC_SIGN_IN){
-//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-//                try {
-//                    GoogleSignInAccount account = task.getResult(ApiException.class);
-//                    firebaseAuthwithGoogle(account);
-//                } catch (ApiException e) {
-//                    Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-//                }
-//        }
 
         if(requestCode == 1000){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -283,7 +273,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                     finish();
                 }else{
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

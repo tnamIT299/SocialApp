@@ -2,6 +2,7 @@ package com.trinhthanhnam.mysocialapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -197,6 +199,8 @@ public class GroupInfoActivity extends AppCompatActivity {
                                 editGroupTv.setVisibility(View.VISIBLE);
                                 addParticipantTv.setVisibility(View.VISIBLE);
                                 leaveGroupTv.setText("Delete Group");
+                                Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.baseline_delete_24);
+                                leaveGroupTv.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
                             }
                         }
                         loadParticipants();

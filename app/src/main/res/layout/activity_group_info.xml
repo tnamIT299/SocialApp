@@ -9,7 +9,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/lavender">
     </androidx.appcompat.widget.Toolbar>
     <LinearLayout
@@ -23,8 +23,9 @@
             <ImageView
                 android:id="@+id/groupIconIv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="250dp"
                 android:adjustViewBounds="true"
+                android:scaleType="fitXY"
                 android:minHeight="300dp"/>
             <TextView
                 android:id="@+id/descriptionTv"

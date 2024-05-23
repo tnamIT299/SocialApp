@@ -17,11 +17,13 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,7 +84,7 @@ import retrofit2.Callback;
 public class ChatActivity extends AppCompatActivity {
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ImageButton btn_send, attachBtn;
+    ImageButton btn_send, attachBtn, moreIv;
     ImageView profileIv,blockIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
@@ -134,6 +136,7 @@ public class ChatActivity extends AppCompatActivity {
         btn_send = findViewById(R.id.sendBtn);
         attachBtn = findViewById(R.id.attachBtn);
         blockIv = findViewById(R.id.blockIv);
+        moreIv = findViewById(R.id.moreIv);
         typingLayout = findViewById(R.id.typingLayout);
 
         //init permisson array
@@ -242,18 +245,51 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-        blockIv.setOnClickListener(new View.OnClickListener() {
+
+        moreIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isBlocked){
-                    unBlockUser();
-                    typingLayout.setVisibility(View.VISIBLE);
-                }else{
-                    blockUser();
-                    typingLayout.setVisibility(View.GONE);
-                }
+                final PopupMenu popup = new PopupMenu(ChatActivity.this, moreIv);
+                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                MenuItem blockItem = popup.getMenu().findItem(R.id.blockIv);
+                blockItem.setTitle(isBlocked ? "Unblock" : "Block");
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (item.getItemId() == R.id.blockIv) {
+                            // Handle option 1 click
+                            if (isBlocked){
+                                unBlockUser();
+                                typingLayout.setVisibility(View.VISIBLE);
+                            }else{
+                                blockUser();
+                                typingLayout.setVisibility(View.GONE);
+                            }
+                            // Toggle the block state
+                            isBlocked = !isBlocked;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+
+                popup.show(); // Showing popup menu
             }
         });
+
+
+//        blockIv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (isBlocked){
+//                    unBlockUser();
+//                    typingLayout.setVisibility(View.VISIBLE);
+//                }else{
+//                    blockUser();
+//                    typingLayout.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
         readMessage();
         checkIsBlocked();
@@ -268,7 +304,6 @@ public class ChatActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()){
                             if(ds.exists()){
-                                blockIv.setImageResource(R.drawable.ic_blocked);
                                 isBlocked = true;
                                 typingLayout.setVisibility(View.GONE); // Hide the typingLayout
                             }
@@ -294,7 +329,6 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(ChatActivity.this, "Block Successfully...", Toast.LENGTH_SHORT).show();
-                        blockIv.setImageResource(R.drawable.ic_blocked);
                         typingLayout.setVisibility(View.GONE);
                     }
                 })
@@ -320,7 +354,6 @@ public class ChatActivity extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Void unused) {
                                                 Toast.makeText(ChatActivity.this, "Unblocked Successfully...", Toast.LENGTH_SHORT).show();
-                                                blockIv.setImageResource(R.drawable.ic_unblocked);
                                                 typingLayout.setVisibility(View.VISIBLE);
                                             }
                                         })

@@ -2,8 +2,20 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="Unnamed">
-        <State />
+      <entry key="app">
+        <State>
+          <runningDeviceTargetsSelectedWithDialog>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="5200485fea2115ab" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetsSelectedWithDialog>
+        </State>
       </entry>
     </value>
   </component>
