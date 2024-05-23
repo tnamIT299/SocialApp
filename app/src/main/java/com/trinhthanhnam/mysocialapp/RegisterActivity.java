@@ -126,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
                             //put data within hashmap in database
                             reference.child(uid).setValue(hashMap);
                             Toast.makeText(RegisterActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(RegisterActivity.this, DashboardActivity.class));
+                            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                         } else {
                             Toast.makeText(RegisterActivity.this, "Xác thực thất bại", Toast.LENGTH_SHORT).show();
                         }
