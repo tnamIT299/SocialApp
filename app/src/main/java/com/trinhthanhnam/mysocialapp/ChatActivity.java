@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -57,8 +58,14 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+import com.stringee.StringeeClient;
+import com.stringee.call.StringeeCall;
+import com.stringee.call.StringeeCall2;
+import com.stringee.exception.StringeeError;
+import com.stringee.listener.StringeeConnectionListener;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterChat;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterUser;
+import com.trinhthanhnam.mysocialapp.calling.TokenGenerator;
 import com.trinhthanhnam.mysocialapp.model.Chat;
 import com.trinhthanhnam.mysocialapp.model.User;
 import com.trinhthanhnam.mysocialapp.notifications.APIService;
@@ -68,6 +75,8 @@ import com.trinhthanhnam.mysocialapp.notifications.Response;
 import com.trinhthanhnam.mysocialapp.notifications.Sender;
 import com.trinhthanhnam.mysocialapp.notifications.Token;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +84,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -82,9 +92,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 public class ChatActivity extends AppCompatActivity {
+    TokenGenerator tokenGenerator = new TokenGenerator();
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ImageButton btn_send, attachBtn, moreIv;
+    ImageButton btn_send, attachBtn, moreIv, duoIv;
     ImageView profileIv,blockIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
@@ -98,6 +109,9 @@ public class ChatActivity extends AppCompatActivity {
     DatabaseReference userRefForSeen;
     List<Chat> chatList;
     AdapterChat adapterChat;
+
+    private Handler handler ;
+    private Runnable runnableCode;
 
 
     String hisuid;
@@ -116,6 +130,9 @@ public class ChatActivity extends AppCompatActivity {
     //permisson array
     String [] cameraPermission;
     String [] storagePermission;
+
+    public static StringeeClient client;
+    static Map<String, StringeeCall> callMap = new HashMap<>();
 
 
 
@@ -137,6 +154,7 @@ public class ChatActivity extends AppCompatActivity {
         attachBtn = findViewById(R.id.attachBtn);
         blockIv = findViewById(R.id.blockIv);
         moreIv = findViewById(R.id.moreIv);
+        duoIv = findViewById(R.id.duoIv);
         typingLayout = findViewById(R.id.typingLayout);
 
         //init permisson array
@@ -155,14 +173,26 @@ public class ChatActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         hisuid = intent.getStringExtra("hisUID");
+        myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
         usersDbRef = firebaseDatabase.getReference("Users");
 
-        //search user to get that user's info
+        //refesh token after 1hour
+        handler = new Handler();
+        runnableCode = new Runnable() {
+            @Override
+            public void run() {
+                String newToken = tokenGenerator.genAccessToken(TokenGenerator.SID_KEY, TokenGenerator.SECRET_KEY, 3600, myUid);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+                reference.child(myUid).child("accessTokenCall").setValue(newToken);
+                handler.postDelayed(this, 3600 * 1000);
+            }
+        };
+        handler.post(runnableCode);
+
         Query userQuery = usersDbRef.orderByChild("uid").equalTo(hisuid);
-        //get user picture and name
         userQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -277,12 +307,115 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        duoIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hisuid == null || hisuid.isEmpty()) {
+                    Toast.makeText(ChatActivity.this, "You can't make a call", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
+                intent.putExtra("to", hisuid);
+                intent.putExtra("isIncomingCall", false);
+                intent.putExtra("nameTo", nameTv.getText().toString().trim());
+                startActivity(intent);
+            }
+        });
 
+        initStringeeConnection();
         readMessage();
         checkIsBlocked();
         seenMessage();
 
+
+
     }
+
+    private void initStringeeConnection() {
+        client = new StringeeClient(this);
+        client.setConnectionListener(new StringeeConnectionListener() {
+            @Override
+            public void onConnectionConnected(StringeeClient stringeeClient, boolean b) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("Stringee", "Connected as " + stringeeClient.getUserId() + " successfully!");
+                    }
+                });
+            }
+
+            @Override
+            public void onConnectionDisconnected(StringeeClient stringeeClient, boolean b) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ChatActivity.this, "Disconnect!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onIncomingCall(StringeeCall stringeeCall) {
+                runOnUiThread(()->{
+                    callMap.put(stringeeCall.getCallId(), stringeeCall);
+                    Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
+                    intent.putExtra("callId", stringeeCall.getCallId());
+                    intent.putExtra("isIncomingCall", true);
+                    intent.putExtra("nameTo", nameTv.getText().toString().trim());
+                    startActivity(intent);
+                });
+            }
+
+            @Override
+            public void onIncomingCall2(StringeeCall2 stringeeCall2) {
+
+            }
+
+            @Override
+            public void onConnectionError(StringeeClient stringeeClient, StringeeError stringeeError) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Error: " + stringeeError.getMessage());
+                        Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestNewToken(StringeeClient stringeeClient) {
+
+            }
+
+            @Override
+            public void onCustomMessage(String s, JSONObject jsonObject) {
+
+            }
+
+            @Override
+            public void onTopicMessage(String s, JSONObject jsonObject) {
+
+            }
+        });
+
+        usersDbRef.child(myUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String accessToken = dataSnapshot.child("accessTokenCall").getValue(String.class);
+                    client.connect(accessToken.trim().toString());
+                    System.out.println(accessToken);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý lỗi
+            }
+        });
+
+    }
+
     private void checkIsBlocked() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
         ref.child(firebaseAuth.getUid()).child("BlockedUsers").orderByChild("uid").equalTo(hisuid)
@@ -443,7 +576,7 @@ public class ChatActivity extends AppCompatActivity {
         hashMap.put("type", "text");
         databaseReference.child("Chats").push().setValue(hashMap);
 
-       final DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -463,22 +596,22 @@ public class ChatActivity extends AppCompatActivity {
                 .child(myUid)
                 .child(hisuid);
         chatRef1.addValueEventListener(new ValueEventListener() {
-       @Override
-       public void onDataChange(@NonNull DataSnapshot snapshot) {
-              if(!snapshot.exists()){
-                chatRef1.child("id").setValue(hisuid);
-              }
-       }
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()){
+                    chatRef1.child("id").setValue(hisuid);
+                }
+            }
 
-       @Override
-       public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-       }
-   });
+            }
+        });
 
         final DatabaseReference chatRef2 = FirebaseDatabase.getInstance().getReference("ChatList")
-                        .child(hisuid)
-                        .child(myUid);
+                .child(hisuid)
+                .child(myUid);
         chatRef2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

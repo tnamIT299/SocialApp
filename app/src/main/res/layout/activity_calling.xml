@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CallingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/statusTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:gravity="center"
+            android:text="Calling"
+            android:textColor="@color/black"
+            android:textSize="20sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/nameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:text="Name"
+            android:textColor="@color/black"
+            android:textSize="30sp">
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/v_CallControl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/btnSpeaker"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginRight="80dp"
+                android:src="@drawable/speaker"
+                android:scaleType="fitXY">
+            </ImageView>
+
+            <ImageView
+                android:id="@+id/btnMute"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="80dp"
+                android:src="@drawable/mute"
+                android:scaleType="fitXY">
+            </ImageView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutIncomingCall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnAnswer"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginRight="40dp"
+                android:src="@drawable/accept"
+                android:scaleType="fitXY">
+            </ImageView>
+
+            <ImageView
+                android:id="@+id/btnReject"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="40dp"
+                android:src="@drawable/end"
+                android:scaleType="fitXY">
+            </ImageView>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnEnd"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:scaleType="fitXY"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/end">
+        </ImageView>
+
+    </LinearLayout>
+</RelativeLayout>

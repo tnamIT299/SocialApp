@@ -23,10 +23,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.trinhthanhnam.mysocialapp.calling.TokenGenerator;
 
 import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
+    TokenGenerator tokenGenerator = new TokenGenerator();
     EditText edt_email, edt_pass, edt_cfpass;
     TextView txt_haveAcc;
     Button btn_register;
@@ -65,10 +67,10 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                    String email = edt_email.getText().toString().trim();
-                    String pass = edt_pass.getText().toString().trim();
-                    String cfpass = edt_cfpass.getText().toString().trim();
-                    //validate
+                String email = edt_email.getText().toString().trim();
+                String pass = edt_pass.getText().toString().trim();
+                String cfpass = edt_cfpass.getText().toString().trim();
+                //validate
                 if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
                     edt_email.setError("Email không hợp lệ");
                     edt_email.setFocusable(true);
@@ -95,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                         // Dismiss progressDialog
+                        // Dismiss progressDialog
                         if (task.isSuccessful()) {
                             progressDialog.dismiss();
 
@@ -116,7 +118,7 @@ public class RegisterActivity extends AppCompatActivity {
                             hashMap.put("phone", "");
                             hashMap.put("image", "");
                             hashMap.put("cover", "");
-
+                            hashMap.put("accessTokenCall", tokenGenerator.genAccessToken(TokenGenerator.SID_KEY, TokenGenerator.SECRET_KEY, 3600, uid));
 
                             //Firebase data instance
                             FirebaseDatabase database = FirebaseDatabase.getInstance();

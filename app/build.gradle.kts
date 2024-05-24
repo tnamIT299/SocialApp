@@ -26,6 +26,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -41,6 +45,10 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.stringee.sdk.android:stringee-android-sdk:2.0")
+    implementation ("com.android.volley:volley:1.2.1")
+    implementation ("io.jsonwebtoken:jjwt:0.9.1")
+    implementation ("com.auth0:java-jwt:3.18.2")
 
 
     //google
