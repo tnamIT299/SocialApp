@@ -2,53 +2,45 @@ package com.trinhthanhnam.mysocialapp;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.stringee.call.StringeeCall;
+import com.stringee.call.StringeeCall2;
 import com.stringee.common.StringeeAudioManager;
 import com.stringee.listener.StatusListener;
-import com.trinhthanhnam.mysocialapp.databinding.ActivityCallingBinding;
+import com.stringee.video.StringeeVideoTrack;
+import com.trinhthanhnam.mysocialapp.databinding.ActivityVideoCallBinding;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+public class VideoCallActivity extends AppCompatActivity {
 
-public class CallingActivity extends AppCompatActivity {
-    ActivityCallingBinding binding;
-    private StringeeCall call;
+    ActivityVideoCallBinding binding;
+    private StringeeCall2 call;
     private boolean isIncomingCall;
     private String to;
     private String callId;
     private String nameTo;
 
-    StringeeCall.SignalingState mSignalingState;
-    StringeeCall.MediaState mMediaState;
+    StringeeCall2.SignalingState mSignalingState;
+    StringeeCall2.MediaState mMediaState;
     StringeeAudioManager audioManager;
     boolean isSpeaker = false;
     boolean isMicOn = true;
+    boolean isVideo = true;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityCallingBinding.inflate(getLayoutInflater());
+        binding = ActivityVideoCallBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         addEvent();
 
@@ -57,12 +49,12 @@ public class CallingActivity extends AppCompatActivity {
             to = getIntent().getStringExtra("to");
             isIncomingCall = getIntent().getBooleanExtra("isIncomingCall", false);
             nameTo = getIntent().getStringExtra("nameTo");
-            binding.nameTv.setText(nameTo);
+
+            System.out.println("isIncomingCall: " + isIncomingCall);
         }
 
         binding.layoutIncomingCall.setVisibility(isIncomingCall ? View.VISIBLE : View.GONE);
         binding.btnEnd.setVisibility(isIncomingCall ? View.GONE : View.VISIBLE);
-
 
         initCall();
 
@@ -70,34 +62,31 @@ public class CallingActivity extends AppCompatActivity {
 
     private void initCall() {
         if(isIncomingCall) {
-            binding.nameTv.setText(nameTo);
-            call = ChatActivity.callMap.get(callId);
+            call = ChatActivity.call2Map.get(callId);
             if(call == null){
                 finish();
                 return;
             }
         } else {
-            call = new StringeeCall(ChatActivity.client , ChatActivity.client.getUserId(), to);
+            call = new StringeeCall2(ChatActivity.client , ChatActivity.client.getUserId(), to);
+            call.setVideoCall(true);
         }
-        call.setCallListener(new StringeeCall.StringeeCallListener() {
+        call.setCallListener(new StringeeCall2.StringeeCallListener() {
             @Override
-            public void onSignalingStateChange(StringeeCall stringeeCall, StringeeCall.SignalingState signalingState, String s, int i, String s1) {
+            public void onSignalingStateChange(StringeeCall2 stringeeCall2, StringeeCall2.SignalingState signalingState, String s, int i, String s1) {
                 runOnUiThread(() -> {
                     mSignalingState = signalingState;
                     switch (signalingState) {
                         case CALLING:
                             binding.statusTv.setText("Calling...");
-                            binding.nameTv.setText(nameTo);
                             break;
                         case RINGING:
                             binding.statusTv.setText("Ringing...");
-                            binding.nameTv.setText(nameTo);
                             break;
                         case ANSWERED:
                             binding.statusTv.setText("Answered");
-                            if (mMediaState == StringeeCall.MediaState.CONNECTED) {
+                            if (mMediaState == StringeeCall2.MediaState.CONNECTED) {
                                 binding.statusTv.setText("Connected");
-                                binding.nameTv.setText(nameTo);
                             }
                             break;
                         case BUSY:
@@ -115,7 +104,7 @@ public class CallingActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(StringeeCall stringeeCall, int i, String s) {
+            public void onError(StringeeCall2 stringeeCall2, int i, String s) {
                 runOnUiThread(()->{
                     finish();
                     audioManager.stop();
@@ -123,45 +112,72 @@ public class CallingActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onHandledOnAnotherDevice(StringeeCall stringeeCall, StringeeCall.SignalingState signalingState, String s) {
+            public void onHandledOnAnotherDevice(StringeeCall2 stringeeCall2, StringeeCall2.SignalingState signalingState, String s) {
 
             }
 
             @Override
-            public void onMediaStateChange(StringeeCall stringeeCall, StringeeCall.MediaState mediaState) {
+            public void onMediaStateChange(StringeeCall2 stringeeCall2, StringeeCall2.MediaState mediaState) {
                 runOnUiThread(()->{
                     mMediaState = mediaState;
-                    if(mediaState == StringeeCall.MediaState.CONNECTED){
-                        if(mSignalingState == StringeeCall.SignalingState.ANSWERED) {
-                            binding.statusTv.setText("Connected");
+                    if(mediaState == StringeeCall2.MediaState.CONNECTED){
+                        if(mSignalingState == StringeeCall2.SignalingState.ANSWERED) {
+                            binding.statusTv.setText("Started");
                         }
                     }else{
-                        binding.statusTv.setText("Connecting...");
+                        binding.statusTv.setText("Retry to connect...");
                     }
                 });
             }
 
             @Override
-            public void onLocalStream(StringeeCall stringeeCall) {
+            public void onLocalStream(StringeeCall2 stringeeCall2) {
+                runOnUiThread(()->{
+                    binding.vLocal.removeAllViews();
+                    binding.vLocal.addView(stringeeCall2.getLocalView());
+                    stringeeCall2.renderLocalView(true);
+
+                });
 
             }
 
             @Override
-            public void onRemoteStream(StringeeCall stringeeCall) {
+            public void onRemoteStream(StringeeCall2 stringeeCall2) {
+                runOnUiThread(()->{
+                    binding.vRemote.removeAllViews();
+                    binding.vRemote.addView(stringeeCall2.getRemoteView());
+                    stringeeCall2.renderRemoteView(false);
+
+                });
+            }
+
+            @Override
+            public void onVideoTrackAdded(StringeeVideoTrack stringeeVideoTrack) {
 
             }
 
             @Override
-            public void onCallInfo(StringeeCall stringeeCall, JSONObject jsonObject) {
+            public void onVideoTrackRemoved(StringeeVideoTrack stringeeVideoTrack) {
 
             }
+
+            @Override
+            public void onCallInfo(StringeeCall2 stringeeCall2, JSONObject jsonObject) {
+
+            }
+
+            @Override
+            public void onTrackMediaStateChange(String s, StringeeVideoTrack.MediaType mediaType, boolean b) {
+
+            }
+
         });
 
         audioManager = new StringeeAudioManager(this);
         audioManager.start((audioDevice, set) -> {
 
         });
-        audioManager.setSpeakerphoneOn(false);
+        audioManager.setSpeakerphoneOn(true);
 
         if(isIncomingCall) {
             call.ringing(new StatusListener() {
@@ -258,6 +274,35 @@ public class CallingActivity extends AppCompatActivity {
                         finish();
                     }
 
+                });
+            }
+        });
+
+        binding.btnSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runOnUiThread(()->{
+                    if(call != null){
+                        call.switchCamera(new StatusListener() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        binding.btnVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runOnUiThread(()->{
+                    if(call != null){
+                        call.enableVideo(!isVideo);
+                        isVideo = !isVideo;
+                        binding.btnVideo.setBackgroundResource(isVideo ? R.drawable.facetime : R.drawable.novideo);
+                    }
                 });
             }
         });

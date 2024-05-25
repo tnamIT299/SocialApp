@@ -95,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
     TokenGenerator tokenGenerator = new TokenGenerator();
     Toolbar toolbar;
     RecyclerView recyclerView;
-    ImageButton btn_send, attachBtn, moreIv, duoIv;
+    ImageButton btn_send, attachBtn, moreIv, duoIv, callIv;
     ImageView profileIv,blockIv;
     TextView nameTv , userStatusTv;
     EditText messageEt;
@@ -133,6 +133,7 @@ public class ChatActivity extends AppCompatActivity {
 
     public static StringeeClient client;
     static Map<String, StringeeCall> callMap = new HashMap<>();
+    static Map<String, StringeeCall2> call2Map = new HashMap<>();
 
 
 
@@ -155,6 +156,7 @@ public class ChatActivity extends AppCompatActivity {
         blockIv = findViewById(R.id.blockIv);
         moreIv = findViewById(R.id.moreIv);
         duoIv = findViewById(R.id.duoIv);
+        callIv = findViewById(R.id.callIv);
         typingLayout = findViewById(R.id.typingLayout);
 
         //init permisson array
@@ -314,6 +316,20 @@ public class ChatActivity extends AppCompatActivity {
                     Toast.makeText(ChatActivity.this, "You can't make a call", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                Intent intent = new Intent(ChatActivity.this, VideoCallActivity.class);
+                intent.putExtra("to", hisuid);
+                intent.putExtra("isIncomingCall", false);
+                startActivity(intent);
+            }
+        });
+
+        callIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hisuid == null || hisuid.isEmpty()) {
+                    Toast.makeText(ChatActivity.this, "You can't make a call", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent intent = new Intent(ChatActivity.this, CallingActivity.class);
                 intent.putExtra("to", hisuid);
                 intent.putExtra("isIncomingCall", false);
@@ -368,7 +384,13 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onIncomingCall2(StringeeCall2 stringeeCall2) {
-
+                runOnUiThread(() ->{
+                    call2Map.put(stringeeCall2.getCallId(), stringeeCall2);
+                    Intent intent = new Intent(ChatActivity.this, VideoCallActivity.class);
+                    intent.putExtra("callId", stringeeCall2.getCallId());
+                    intent.putExtra("isIncomingCall", true);
+                    startActivity(intent);
+                });
             }
 
             @Override

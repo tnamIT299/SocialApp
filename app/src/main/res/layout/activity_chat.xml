@@ -54,10 +54,19 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/callIv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@color/lavender"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/baseline_call_24"/>
+
+            <ImageButton
                 android:id="@+id/duoIv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="15dp"
                 android:background="@color/lavender"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/baseline_duo_24"/>

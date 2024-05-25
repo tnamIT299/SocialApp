@@ -30,6 +30,9 @@
         android:theme="@style/Theme.MySocialApp"
         tools:targetApi="31">
         <activity
+            android:name=".VideoCallActivity"
+            android:exported="false" />
+        <activity
             android:name=".CallingActivity"
             android:exported="false" />
         <activity
