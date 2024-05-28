@@ -78,6 +78,21 @@
             android:layout_height="1dp"
             android:background="#eee"/>
         <TextView
+            android:id="@+id/searchMessageTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search Message"
+            android:drawableTint="@color/black"
+            android:drawableStart="@drawable/ic_search"
+            android:gravity="center_vertical"
+            android:drawablePadding="10dp"
+            android:padding="5dp"
+            android:textColor="@color/black"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eee"/>
+        <TextView
             android:id="@+id/leaveGroupTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

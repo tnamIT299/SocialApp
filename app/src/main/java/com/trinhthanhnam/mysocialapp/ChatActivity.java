@@ -14,12 +14,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -44,6 +46,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -64,6 +67,7 @@ import com.stringee.call.StringeeCall2;
 import com.stringee.exception.StringeeError;
 import com.stringee.listener.StringeeConnectionListener;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterChat;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterSearchResults;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterUser;
 import com.trinhthanhnam.mysocialapp.calling.TokenGenerator;
 import com.trinhthanhnam.mysocialapp.model.Chat;
@@ -299,6 +303,10 @@ public class ChatActivity extends AppCompatActivity {
                             // Toggle the block state
                             isBlocked = !isBlocked;
                             return true;
+                        } else if (item.getItemId() == R.id.searchMessagesIv) {
+                            // Xử lý khi nhấp vào tùy chọn tìm kiếm tin nhắn
+                            showSearchDialog(); // Gọi hàm để hiển thị Dialog tìm kiếm
+                            return true;
                         } else {
                             return false;
                         }
@@ -346,6 +354,120 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
+
+    private void showSearchDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ChatActivity.this);
+        builder.setTitle("Search Messages");
+
+        // Thiết lập EditText để nhập từ khóa
+        final EditText input = new EditText(ChatActivity.this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        // Thiết lập các thông số cho EditText (nếu cần)
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        input.setLayoutParams(lp);
+        builder.setView(input);
+
+        // Thiết lập nút "Tìm kiếm"
+        builder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String keyword = input.getText().toString().trim();
+                if (!keyword.isEmpty()) {
+                    searchMessagesInFirebase(keyword);
+                } else {
+                    Toast.makeText(ChatActivity.this, "Please enter a keyword to search", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Thiết lập nút "Hủy"
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void searchMessagesInFirebase(String keyword) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Chats");
+        // Chuyển đổi keyword sang chữ thường để tìm kiếm không phân biệt chữ hoa chữ thường
+        String keywordLower = keyword.toLowerCase();
+        // Tạo truy vấn để tìm kiếm các tin nhắn chứa keyword trong trường "message"
+        ref.orderByChild("message")
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Chat> searchResults = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    // Lấy tin nhắn từ dataSnapshot
+                    Chat chat = snapshot.getValue(Chat.class);
+                    // Thêm tin nhắn vào danh sách kết quả nếu tin nhắn không null
+                    if (chat != null && chat.getType().equals("text") && !chat.getMessage().equals("This message was deleted...") && ((chat.getSender().equals(myUid) && chat.getReceiver().equals(hisuid)) || (chat.getSender().equals(hisuid) && chat.getReceiver().equals(myUid)))) {
+                        // Chuyển đổi nội dung tin nhắn sang chữ thường để so sánh không phân biệt chữ hoa chữ thường
+                        String messageLower = chat.getMessage().toLowerCase();
+                        if (messageLower.contains(keywordLower)) {
+                            searchResults.add(chat);
+                        }
+                    }
+                }
+
+                if (searchResults.isEmpty()) {
+                    Toast.makeText(ChatActivity.this, "No messages found", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Hiển thị kết quả tìm kiếm
+                    showSearchResults(searchResults);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ChatActivity.this, "Search failed: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+    private void showSearchResults(List<Chat> searchResults) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Search Results");
+
+        // Tạo một layout XML tùy chỉnh cho nội dung của Dialog
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_search_results_list, null);
+        builder.setView(dialogView);
+
+        // Ánh xạ RecyclerView trong layout của Dialog
+        RecyclerView recyclerView = dialogView.findViewById(R.id.searchResultsRecyclerView);
+
+        // Thiết lập LayoutManager cho RecyclerView
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // Tạo Adapter và thiết lập cho RecyclerView
+        AdapterSearchResults adapter = new AdapterSearchResults(searchResults, this);
+        recyclerView.setAdapter(adapter);
+
+        // Hiển thị Dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        // Thiết lập sự kiện click cho nút "OK"
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Đóng Dialog khi người dùng nhấn "OK"
+            }
+        });
+    }
+
+
 
     private void initStringeeConnection() {
         client = new StringeeClient(this);

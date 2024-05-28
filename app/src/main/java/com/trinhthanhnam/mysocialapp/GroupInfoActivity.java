@@ -4,10 +4,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,10 +25,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,11 +38,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterGroupSearchResults;
 import com.trinhthanhnam.mysocialapp.adapter.AdapterParticipantAdd;
+import com.trinhthanhnam.mysocialapp.adapter.AdapterSearchResults;
+import com.trinhthanhnam.mysocialapp.model.Chat;
+import com.trinhthanhnam.mysocialapp.model.Group_Chat;
 import com.trinhthanhnam.mysocialapp.model.User;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class GroupInfoActivity extends AppCompatActivity {
@@ -48,7 +58,7 @@ public class GroupInfoActivity extends AppCompatActivity {
     private AdapterParticipantAdd adapterParticipantAdd;
     private ActionBar actionBar;
     private ImageView groupIconIv;
-    private TextView descriptionTv,createByTv,editGroupTv,addParticipantTv,leaveGroupTv,participantsTv;
+    private TextView descriptionTv,createByTv,editGroupTv,addParticipantTv,leaveGroupTv,participantsTv,searchMessageTv;
     private RecyclerView participantsRv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +83,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         leaveGroupTv = findViewById(R.id.leaveGroupTv);
         participantsTv = findViewById(R.id.participantsTv);
         participantsRv = findViewById(R.id.participantsRv);
+        searchMessageTv = findViewById(R.id.searchMessageTv);
 
         groupId = getIntent().getStringExtra("groupId");
         firebaseAuth = FirebaseAuth.getInstance();
@@ -130,6 +141,114 @@ public class GroupInfoActivity extends AppCompatActivity {
                 Intent intent = new Intent(GroupInfoActivity.this,GroupEditActivity.class);
                 intent.putExtra("groupId",groupId);
                 startActivity(intent);
+            }
+        });
+        searchMessageTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GroupInfoActivity.this);
+                builder.setTitle("Search Messages");
+
+                // Thiết lập EditText để nhập từ khóa
+                final EditText input = new EditText(GroupInfoActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+                // Thiết lập các thông số cho EditText (nếu cần)
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                input.setLayoutParams(lp);
+                builder.setView(input);
+
+                // Thiết lập nút "Tìm kiếm"
+                builder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String keyword = input.getText().toString().trim();
+                        if (!keyword.isEmpty()) {
+                            searchMessagesInFirebase(keyword);
+                        } else {
+                            Toast.makeText(GroupInfoActivity.this, "Please enter a keyword to search", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                // Thiết lập nút "Hủy"
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private void searchMessagesInFirebase(String keyword) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Groups");
+        String keywordLower = keyword.toLowerCase();
+        ref.child(groupId).child("Messages")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<Group_Chat> searchResults = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            // Lấy tin nhắn từ dataSnapshot
+                            Group_Chat chat = snapshot.getValue(Group_Chat.class);
+                            // Thêm tin nhắn vào danh sách kết quả nếu tin nhắn không null
+                            if (chat != null && chat.getType().equals("text") && !chat.getMessage().equals("This message was deleted...")) {
+                                // Chuyển đổi nội dung tin nhắn sang chữ thường để so sánh không phân biệt chữ hoa chữ thường
+                                String messageLower = chat.getMessage().toLowerCase();
+                                if (messageLower.contains(keywordLower)) {
+                                    searchResults.add(chat);
+                                }
+                            }
+                        }
+                        if (searchResults.isEmpty()) {
+                            Toast.makeText(GroupInfoActivity.this, "No messages found", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Hiển thị kết quả tìm kiếm
+                            showSearchResults(searchResults);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Toast.makeText(GroupInfoActivity.this, "Search failed: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showSearchResults(List<Group_Chat> searchResults) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Search Results");
+
+        // Tạo một layout XML tùy chỉnh cho nội dung của Dialog
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_search_results_list, null);
+        builder.setView(dialogView);
+
+        // Ánh xạ RecyclerView trong layout của Dialog
+        RecyclerView recyclerView = dialogView.findViewById(R.id.searchResultsRecyclerView);
+
+        // Thiết lập LayoutManager cho RecyclerView
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // Tạo Adapter và thiết lập cho RecyclerView
+        AdapterGroupSearchResults adapter = new AdapterGroupSearchResults(searchResults, this);
+        recyclerView.setAdapter(adapter);
+        // Hiển thị Dialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        // Thiết lập sự kiện click cho nút "OK"
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Đóng Dialog khi người dùng nhấn "OK"
             }
         });
     }

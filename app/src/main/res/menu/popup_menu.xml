@@ -3,5 +3,8 @@
     <item
         android:id="@+id/blockIv"
         android:title="Block"/>
+    <item
+        android:id="@+id/searchMessagesIv"
+        android:title="Search Messages" />
 
 </menu>

@@ -371,7 +371,7 @@ public class GroupChatActivity extends AppCompatActivity {
                             Group_Chat model = ds.getValue(Group_Chat.class);
                             groupChatList.add(model);
                         }
-                        adapterGroup_chat = new AdapterGroup_Chat(GroupChatActivity.this,groupChatList);
+                        adapterGroup_chat = new AdapterGroup_Chat(GroupChatActivity.this,groupId,groupChatList);
                         chatRcv.setAdapter(adapterGroup_chat);
                     }
 

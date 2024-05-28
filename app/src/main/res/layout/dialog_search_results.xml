@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:contentPadding="3dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/senderTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="His Name"
+            android:textStyle="bold"
+            android:layout_marginStart="5dp"
+            android:textSize="20sp" />
+
+
+        <TextView
+            android:id="@+id/messageTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Message"
+            android:textSize="18sp"
+            android:maxLines="2"
+            android:layout_marginStart="5dp"
+            android:layout_below="@+id/senderTv"/>
+        <TextView
+            android:id="@+id/timeTv"
+            android:layout_below="@+id/messageTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="12:30"
+            android:gravity="end"
+            android:textSize="14sp"/>
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

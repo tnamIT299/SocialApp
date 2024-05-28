@@ -50,7 +50,6 @@ dependencies {
     implementation ("io.jsonwebtoken:jjwt:0.9.1")
     implementation ("com.auth0:java-jwt:3.18.2")
 
-
     //google
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-storage")

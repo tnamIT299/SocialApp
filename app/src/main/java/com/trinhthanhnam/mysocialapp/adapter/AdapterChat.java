@@ -168,8 +168,6 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot ds: snapshot.getChildren()){
                     if(ds.child("sender").getValue().equals(myUID)){
-
-
                         //set message "This message was deleted..."
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("message", "This message was deleted...");
