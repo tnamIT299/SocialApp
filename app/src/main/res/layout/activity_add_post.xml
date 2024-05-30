@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddPostActivity"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -16,10 +17,11 @@
 
         <EditText
             android:id="@+id/edtTitle"
-            android:background="@drawable/editextstyle"
+            android:background="@drawable/search_edittext_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
+            android:layout_margin="5dp"
             android:hint="Enter the title ...."
             android:singleLine="true">
         </EditText>
@@ -33,10 +35,11 @@
 
         <EditText
             android:id="@+id/edtDescription"
-            android:background="@drawable/editextstyle"
+            android:background="@drawable/search_edittext_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
+            android:layout_margin="5dp"
             android:minHeight="120dp"
             android:gravity="start"
             android:hint="Enter Description ...."

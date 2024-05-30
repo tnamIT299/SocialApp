@@ -49,6 +49,7 @@ dependencies {
     implementation ("com.android.volley:volley:1.2.1")
     implementation ("io.jsonwebtoken:jjwt:0.9.1")
     implementation ("com.auth0:java-jwt:3.18.2")
+    implementation ("com.google.android.material:material:1.6.0")
 
     //google
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))

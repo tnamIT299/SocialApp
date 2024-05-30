@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Register"
-        android:textSize="20dp"/>
+        android:textSize="20dp" />
 
     <Button
         android:id="@+id/btn_login"

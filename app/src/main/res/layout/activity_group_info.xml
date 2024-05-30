@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".GroupInfoActivity">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolBar"
@@ -33,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:background="#54000000"
                 android:textColor="@color/white"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:layout_above="@+id/createByTv"
                 android:text="The description of the group"/>
             <TextView
@@ -45,7 +46,7 @@
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:layout_alignBottom="@+id/groupIconIv"
-                android:padding="5dp"/>
+                android:padding="10dp"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/editGroupTv"
@@ -56,7 +57,7 @@
             android:drawableStart="@drawable/baseline_edit_24"
             android:gravity="center_vertical"
             android:drawablePadding="10dp"
-            android:padding="5dp"
+            android:padding="10dp"
             android:textColor="@color/black"/>
         <View
             android:layout_width="match_parent"
@@ -71,7 +72,7 @@
             android:drawableStart="@drawable/ic_addperson"
             android:gravity="center_vertical"
             android:drawablePadding="10dp"
-            android:padding="5dp"
+            android:padding="10dp"
             android:textColor="@color/black"/>
         <View
             android:layout_width="match_parent"
@@ -86,7 +87,7 @@
             android:drawableStart="@drawable/ic_search"
             android:gravity="center_vertical"
             android:drawablePadding="10dp"
-            android:padding="5dp"
+            android:padding="10dp"
             android:textColor="@color/black"/>
         <View
             android:layout_width="match_parent"
@@ -101,7 +102,7 @@
             android:drawableStart="@drawable/ic_quit"
             android:gravity="center_vertical"
             android:drawablePadding="10dp"
-            android:padding="5dp"
+            android:padding="10dp"
             android:textColor="@color/black"/>
         <View
             android:layout_width="match_parent"
@@ -116,7 +117,7 @@
             android:drawableStart="@drawable/baseline_groups_24"
             android:gravity="center_vertical"
             android:drawablePadding="10dp"
-            android:padding="5dp"
+            android:padding="10dp"
             android:textColor="@color/black"/>
         <View
             android:layout_width="match_parent"
@@ -126,6 +127,7 @@
             android:id="@+id/participantsRv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/row_participant_add"/>
 

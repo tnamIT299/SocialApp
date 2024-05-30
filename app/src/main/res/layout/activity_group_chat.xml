@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1EDED"
+    android:background="@color/white"
     tools:context=".GroupChatActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -66,6 +66,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolBar"
         app:stackFromEnd="true"
+        android:padding="5dp"
         tools:listitem="@layout/row_groupchat_left"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_above="@id/typingLayout">
@@ -77,8 +78,9 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="5dp"
+        android:layout_margin="5dp"
         android:gravity="center"
-        android:background="@color/white">
+        android:background="@drawable/search_edittext_background">
 
         <ImageButton
             android:id="@+id/attachBtn"

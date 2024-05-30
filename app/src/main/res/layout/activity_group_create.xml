@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".GroupCreateActivity"
     android:orientation="vertical"
+    android:background="@color/white"
     android:padding="20dp">
 
     <com.mikhaellopez.circularimageview.CircularImageView
@@ -22,10 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="Group Name"
+        android:layout_margin="10dp"
         android:layout_below="@+id/groupIcon"
         android:layout_marginTop="20dp"
         android:padding="10dp"
-        android:background="@color/white">
+        android:background="@drawable/search_edittext_background">
 
     </EditText>
 
@@ -40,8 +42,8 @@
         android:hint="Description"
         android:padding="10dp"
         android:layout_below="@+id/edt_GroupName"
-        android:layout_marginTop="20dp"
-        android:background="@color/white">
+        android:layout_margin="10dp"
+        android:background="@drawable/search_edittext_background">
     </EditText>
 
     <Button
@@ -49,7 +51,8 @@
         android:layout_width="200dp"
         android:backgroundTint="@color/lavender"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp"
         android:layout_below="@id/edt_Description"
         android:layout_centerHorizontal="true"
         android:text="Create"/>

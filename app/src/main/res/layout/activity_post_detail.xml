@@ -5,12 +5,15 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:layout_marginTop="10dp"
     tools:context=".PostDetailActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/commentLayout"
+        android:padding="5dp"
         android:background="@color/white">
 
         <LinearLayout
@@ -37,6 +40,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:layout_marginTop="10dp"
+                        android:padding="10dp"
                         android:orientation="horizontal">
 
                         <com.mikhaellopez.circularimageview.CircularImageView
@@ -84,7 +89,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autoLink="all"
+                        android:padding="5dp"
                         android:text="Title"
+                        android:layout_marginLeft="10dp"
                         android:textSize="16sp"
                         android:textStyle="bold">
 
@@ -96,7 +103,9 @@
                         android:layout_height="wrap_content"
                         android:autoLink="all"
                         android:text="Description"
+                        android:padding="5dp"
                         android:textSize="16sp"
+                        android:layout_marginLeft="10dp"
                         android:textStyle="bold"></TextView>
 
                     <ImageView
@@ -116,6 +125,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="10 Like"
+                            android:padding="2dp"
                             android:textColor="@color/lavender"></TextView>
                         <TextView
                             android:id="@+id/postCommentTv"
@@ -123,6 +133,7 @@
                             android:layout_height="wrap_content"
                             android:text="10 Comments"
                             android:layout_weight="1"
+                            android:padding="2dp"
                             android:textAlignment="textEnd"
                             android:gravity="end"
                             android:textColor="@color/lavender"></TextView>
@@ -136,6 +147,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+                        android:padding="10dp"
                         android:orientation="horizontal">
 
                         <Button
@@ -146,6 +158,7 @@
                             android:backgroundTint="#A89E9E"
                             android:drawableLeft="@drawable/like"
                             android:drawablePadding="5dp"
+                            android:layout_marginRight="5dp"
                             android:text="Like"></Button>
 
                         <Button
@@ -170,6 +183,7 @@
                 android:layout_margin="5dp"
                 android:drawableStart="@drawable/ic_comment"
                 android:drawablePadding="5dp"
+                android:padding="5dp"
                 android:text="Comments"
                 android:textColor="@color/black"/>
 
@@ -177,6 +191,7 @@
                 android:id="@+id/commentRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="5dp"
                 android:padding="10dp"></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

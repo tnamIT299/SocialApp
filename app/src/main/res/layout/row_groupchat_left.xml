@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_receiver"
     android:layout_marginEnd="10dp"
     android:layout_marginTop="10dp"
-    android:padding="10dp">
+    android:layout_marginStart="10dp"
+    android:padding="20dp">
     <RelativeLayout
         android:id="@+id/messageLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/nameTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_margin="5dp"
             android:textColor="@color/lavender"
             android:text="Name"
             android:textStyle="bold"/>
@@ -23,7 +24,7 @@
             android:layout_below="@id/nameTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_margin="5dp"
             android:layout_marginBottom="5dp"
             android:textColor="@color/black"
             android:text="The message" />
@@ -32,7 +33,7 @@
             android:id="@+id/messageIv"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:layout_marginStart="5dp"
+            android:layout_margin="20dp"
             android:layout_below="@+id/messageTv"
             android:src="@drawable/baseline_image_24"
             android:scaleType="centerCrop"
@@ -41,10 +42,9 @@
             android:id="@+id/timeTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:text="Time"
             android:layout_below="@id/messageIv"
-            android:layout_marginEnd="5dp"
+            android:layout_margin="3dp"
             android:textSize="12sp"/>
 
     </RelativeLayout>

@@ -5,37 +5,48 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".GroupChatFragment"
+    android:padding="5dp"
     android:background="@color/white">
 
    <LinearLayout
+       android:id="@+id/search_bar"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="horizontal"
-       android:weightSum="10">
+       android:layout_margin="4dp"
+       android:padding="4dp"
+       android:background="@drawable/search_bar_background">
 
       <EditText
           android:id="@+id/edtSearch"
-          android:layout_width="wrap_content"
-          android:layout_height="60dp"
-          android:layout_weight="9"
-          />
-      <ImageButton
-          android:layout_width="30dp"
-          android:layout_height="50dp"
-          android:padding="10dp"
-          android:layout_marginTop="10dp"
-          android:gravity="center"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:background="#ffffff"
-          android:scaleType="fitXY"
-          android:src="@drawable/search"/>
+          android:hint="Search group"
+          android:padding="12dp"
+          android:background="@drawable/search_edittext_background"
+          android:drawablePadding="8dp"
+          android:textColor="#000"
+          android:textColorHint="#888"
+          android:layout_marginEnd="8dp"
+          android:inputType="text"
+          android:imeOptions="actionSearch" />
+
+      <ImageButton
+          android:id="@+id/imgBtn_Search"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          android:src="@drawable/ic_search" />
    </LinearLayout>
 
    <androidx.recyclerview.widget.RecyclerView
        android:id="@+id/groupRv"
+       android:padding="5dp"
+       android:layout_margin="5dp"
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:layout_marginTop="70dp"
+       android:layout_below="@+id/search_bar"
        tools:listitem="@layout/row_groupchat"
        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 

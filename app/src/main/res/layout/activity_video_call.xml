@@ -64,8 +64,8 @@
 
                 <ImageView
                     android:id="@+id/btnSpeaker"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:backgroundTint="@color/white"
                     android:background="@drawable/speaker"/>
 
@@ -79,9 +79,9 @@
 
                 <ImageView
                     android:id="@+id/btnVideo"
-                    android:layout_width="60dp"
+                    android:layout_width="50dp"
                     android:backgroundTint="@color/white"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:background="@drawable/facetime"/>
 
             </LinearLayout>
@@ -94,8 +94,8 @@
 
                 <ImageView
                     android:id="@+id/btnMute"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:backgroundTint="@color/white"
                     android:background="@drawable/unmute"/>
 
@@ -142,8 +142,7 @@
                 android:id="@+id/btnEnd"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/end">
-
+                android:src="@drawable/end">
             </ImageView>
         </LinearLayout>
 

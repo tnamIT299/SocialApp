@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     tools:context=".ThereProfileActivity">
 
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -14,61 +17,60 @@
             <ImageView
                 android:id="@+id/coverIv"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:background="@color/design_default_color_primary"
-                android:scaleType="centerCrop">
-
-            </ImageView>
+                android:layout_height="200dp"
+                android:background="@color/lavender"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/cover_image" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="100dp">
+                android:layout_marginTop="150dp"
+                android:padding="16dp"
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:id="@+id/imvAvatar"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="20dp"
-                    android:padding="5dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="16dp"
                     android:src="@drawable/baseline_account_circle_24"
-                    android:layout_marginLeft="20dp"
-                    android:background="@color/white"
+                    android:background="@drawable/circular_background"
                     android:scaleType="centerCrop"
-                    />
+                    android:contentDescription="@string/profile_image" />
+
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginLeft="10dp">
+                    android:padding="5dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1">
+
                     <TextView
                         android:id="@+id/txtName"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:textColor="@color/white"
-                        android:textSize="25dp"
-                        />
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:text="User Name" />
 
                     <TextView
                         android:id="@+id/txtEmail"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:textColor="@color/white"
-
-                        />
+                        android:textColor="@color/black"
+                        android:text="user@example.com" />
 
                     <TextView
                         android:id="@+id/txtPhone"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:textColor="@color/white"
-
-                        />
+                        android:textColor="@color/black"
+                        android:text="123-456-7890" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -77,20 +79,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Search"
-                android:padding="10dp"
-                android:background="@drawable/editextstyle"
-                android:layout_margin="10dp">
-
-            </EditText>
+                android:padding="12dp"
+                android:background="@drawable/search_edittext_background"
+                android:layout_below="@+id/linearLayout"
+                android:layout_margin="16dp"
+                android:inputType="text"
+                android:imeOptions="actionSearch" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewPost"
-                android:layout_below="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="match_parent"
+                android:layout_below="@+id/searchEdt"
+                android:layout_marginTop="8dp"
+                android:padding="8dp" />
         </RelativeLayout>
+    </ScrollView>
 
-</ScrollView>
+</RelativeLayout>

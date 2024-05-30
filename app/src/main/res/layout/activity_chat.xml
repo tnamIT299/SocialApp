@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ChatActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -22,6 +23,7 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:scaleType="centerCrop"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/baseline_account_circle_24"/>
 
             <LinearLayout
@@ -88,6 +90,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolBar"
+        android:padding="5dp"
+        tools:listitem="@layout/row_groupchat_left"
         android:layout_above="@id/typingLayout">
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -98,8 +102,9 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="5dp"
+        android:layout_margin="5dp"
         android:gravity="center"
-        android:background="@color/white">
+        android:background="@drawable/search_edittext_background">
 
         <ImageButton
             android:id="@+id/attachBtn"

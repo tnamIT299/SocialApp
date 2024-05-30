@@ -148,7 +148,6 @@ public class GroupChatFragment extends Fragment {
                 groupChatList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     if(ds.child("Participants").child(firebaseAuth.getUid()).exists()) {
-
                         if (ds.child("groupTitle").toString().toLowerCase().contains(query.toLowerCase())) {
                             GroupChat model = ds.getValue(GroupChat.class);
                             groupChatList.add(model);

@@ -2,4 +2,7 @@
     <string name="app_name">My SocialApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cover_image">Cover Image</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="add_post">Add Post</string>
 </resources>

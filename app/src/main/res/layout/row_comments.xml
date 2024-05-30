@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="1dp"
-    app:contentPadding="2dp"
-    app:cardBackgroundColor="@color/white">
+    android:layout_margin="3dp"
+    app:contentPadding="5dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
     <RelativeLayout
         android:id="@+id/itemView"
         android:layout_width="match_parent"
@@ -13,29 +16,36 @@
 
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/AvatarImg"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/baseline_account_circle_24"/>
+
         <TextView
             android:id="@+id/nameTv"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/AvatarImg"
-            android:textSize="16sp"
+            android:layout_toEndOf="@id/AvatarImg"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:text="Thanh Nam"/>
+
         <TextView
             android:id="@+id/commentTv"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/nameTv"
             android:layout_toEndOf="@id/AvatarImg"
-            android:layout_toRightOf="@id/AvatarImg"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/black"
-            android:text="This is actual comment"/>
+            android:text="This is actual comment"
+            android:ellipsize="end"
+            android:maxLines="2"/>
 
         <TextView
             android:id="@+id/timeTv"
@@ -43,8 +53,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/commentTv"
             android:layout_toEndOf="@id/AvatarImg"
-            android:text="15/05/2024"/>
-
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:padding="5dp"
+            android:text="15/05/2024"
+            android:textColor="@color/grey"
+            android:textSize="12sp"/>
     </RelativeLayout>
-
 </androidx.cardview.widget.CardView>
