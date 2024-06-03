@@ -33,6 +33,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:layout_below="@+id/search_bar"
+        tools:listitem="@layout/row_post"
         android:padding="10dp">
     </androidx.recyclerview.widget.RecyclerView>
 

@@ -26,6 +26,16 @@
             android:singleLine="true">
         </EditText>
 
+        <Button
+            android:id="@+id/btnImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/baseline_image_24"
+            android:text="Image"
+            android:layout_gravity="right"
+            android:backgroundTint="@color/lavender">
+        </Button>
+
         <ImageView
             android:id="@+id/imageIv"
             android:layout_width="match_parent"
@@ -52,7 +62,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="20dp"
-            android:text="Upload"/>
+            android:text="Upload"
+            android:backgroundTint="@color/lavender"/>
 
 
 

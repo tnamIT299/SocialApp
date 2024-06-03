@@ -1,6 +1,7 @@
 package com.trinhthanhnam.mysocialapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -63,7 +64,7 @@ public class AddPostActivity extends AppCompatActivity {
     DatabaseReference userDbRef;
     EditText titleEt, descriptionEt;
     ImageView imageIv;
-    Button uploadBtn;
+    Button uploadBtn, btnImage;
     //User Infor
     String name, email, uid, dp;
     String edtTitle, edtDescription, edtImage;
@@ -71,12 +72,11 @@ public class AddPostActivity extends AppCompatActivity {
     //progress bar
     ProgressDialog progressBar;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
-
-
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -91,6 +91,7 @@ public class AddPostActivity extends AppCompatActivity {
         descriptionEt = findViewById(R.id.edtDescription);
         imageIv = findViewById(R.id.imageIv);
         uploadBtn = findViewById(R.id.btnUpload);
+        btnImage = findViewById(R.id.btnImage);
 
         //get data through intent from previous activities
         Intent intent = getIntent();
@@ -136,7 +137,7 @@ public class AddPostActivity extends AppCompatActivity {
 
 
         //get image from gallery/camera on click
-        imageIv.setOnClickListener(new View.OnClickListener() {
+        btnImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showImagePickDialog();
@@ -159,15 +160,12 @@ public class AddPostActivity extends AppCompatActivity {
 
                 if(isUpdateKey.equals("editPost")) {
                     beginUpdate(title, description, edtPostId);
+                    startActivity(new Intent(AddPostActivity.this, DashboardActivity.class));
                 }else{
                     uploadData(title, description);
+                    startActivity(new Intent(AddPostActivity.this, DashboardActivity.class));
                 }
 
-//                if (uriImage == null) {
-//                    uploadData(title, description, "noImage");
-//                }else {
-//                    uploadData(title, description, String.valueOf(uriImage));
-//                }
             }
         });
 
