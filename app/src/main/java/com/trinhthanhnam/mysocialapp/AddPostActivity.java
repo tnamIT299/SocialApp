@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +33,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,8 +54,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 public class AddPostActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -64,7 +74,7 @@ public class AddPostActivity extends AppCompatActivity {
     DatabaseReference userDbRef;
     EditText titleEt, descriptionEt;
     ImageView imageIv;
-    Button uploadBtn, btnImage;
+    Button uploadBtn;
     //User Infor
     String name, email, uid, dp;
     String edtTitle, edtDescription, edtImage;
@@ -72,11 +82,12 @@ public class AddPostActivity extends AppCompatActivity {
     //progress bar
     ProgressDialog progressBar;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
+
+
 
         //init permisson array
         cameraPermission = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -91,7 +102,6 @@ public class AddPostActivity extends AppCompatActivity {
         descriptionEt = findViewById(R.id.edtDescription);
         imageIv = findViewById(R.id.imageIv);
         uploadBtn = findViewById(R.id.btnUpload);
-        btnImage = findViewById(R.id.btnImage);
 
         //get data through intent from previous activities
         Intent intent = getIntent();
@@ -137,7 +147,7 @@ public class AddPostActivity extends AppCompatActivity {
 
 
         //get image from gallery/camera on click
-        btnImage.setOnClickListener(new View.OnClickListener() {
+        imageIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showImagePickDialog();
@@ -160,12 +170,10 @@ public class AddPostActivity extends AppCompatActivity {
 
                 if(isUpdateKey.equals("editPost")) {
                     beginUpdate(title, description, edtPostId);
-                    startActivity(new Intent(AddPostActivity.this, DashboardActivity.class));
                 }else{
                     uploadData(title, description);
-                    startActivity(new Intent(AddPostActivity.this, DashboardActivity.class));
                 }
-
+                startActivity(new Intent(AddPostActivity.this, DashboardActivity.class));
             }
         });
 
@@ -175,10 +183,10 @@ public class AddPostActivity extends AppCompatActivity {
     private void handleSendImage(Intent intent) {
         Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
-                uriImage = imageUri;
-                imageIv.setImageURI(imageUri);
-            }
+            uriImage = imageUri;
+            imageIv.setImageURI(imageUri);
         }
+    }
 
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -438,6 +446,13 @@ public class AddPostActivity extends AppCompatActivity {
                                 descriptionEt.setText("");
                                 imageIv.setImageURI(null);
                                 uriImage = null;
+
+                                //send notification
+                                prepareNotify(""+timeStamp,
+                                        ""+name+"add new post",
+                                        ""+title+ "\n" + description,
+                                        "PostNotification",
+                                        "POST");
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -485,6 +500,13 @@ public class AddPostActivity extends AppCompatActivity {
                     descriptionEt.setText("");
                     imageIv.setImageURI(null);
                     uriImage = null;
+
+                    //send notification
+                    prepareNotify(""+timeStamp,
+                            ""+name+ " add new post ",
+                            ""+title+ "\n" + description,
+                            "PostNotification",
+                            "POST");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -495,6 +517,61 @@ public class AddPostActivity extends AppCompatActivity {
             });
         }
 
+    }
+
+    private void prepareNotify(String pId , String title , String description , String notifyType , String notiTopic){
+        String NOTIFICATION_TOPIC = "/topics/"+notiTopic;
+        String NOTIFICATION_TITLE = title;
+        String NOTIFICATION_MESSAGE = description;
+        String NOTIFICATION_TYPE = notifyType;
+
+        //prepare json what to send, and where to send
+        JSONObject notificationJo = new JSONObject();
+        JSONObject notificationBodyJo = new JSONObject();
+
+        try {
+            //what to send
+            notificationBodyJo.put("notificationType", NOTIFICATION_TYPE);
+            notificationBodyJo.put("sender", uid);
+            notificationBodyJo.put("pId", pId);
+            notificationBodyJo.put("pTitle", NOTIFICATION_TITLE);
+            notificationBodyJo.put("pDescription", NOTIFICATION_MESSAGE);
+            //where to send
+            notificationJo.put("to", NOTIFICATION_TOPIC);
+            notificationJo.put("data", notificationBodyJo);
+        } catch (JSONException e) {
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        sendPostNotification(notificationJo);
+        Log.d("abccc", "heyyy");
+    }
+
+    private void sendPostNotification(JSONObject notificationJo) {
+        //send volley object request
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", notificationJo,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.d("FCM_RESPONSE", "onResponse: "+jsonObject.toString());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                //error occurred
+                Toast.makeText(AddPostActivity.this, ""+volleyError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "key=AAAASDRORoE:APA91bFVRjMLv3UWCBuEZIH3qbOkKRD74oTU-0aF6xibnb6ev9yvhp-vgOsaZGyWxfWB4rtoaZsGEVUeUymPDtUn_55OrX5cdO64eXwIZEYwBmD0TO5CY2U_rmuZvSK0mimn52HbUf2P");
+                return headers;
+            }
+        };
+        //enqueue the volley request
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
 
     private void showImagePickDialog() {
@@ -600,7 +677,7 @@ public class AddPostActivity extends AppCompatActivity {
             uid = user.getUid();
         }else{
             startActivity(new Intent(this, MainActivity.class));
-           finish();
+            finish();
         }
     }
 

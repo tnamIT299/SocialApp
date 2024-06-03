@@ -890,7 +890,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendNotificationToToken(String hisuid, String name, String message, String token) {
-        Data data = new Data(myUid, R.drawable.baseline_account_circle_24, name + ": " + message, "New Message", hisuid);
+        Data data = new Data(myUid, R.drawable.baseline_account_circle_24, name + ": " + message, "New Message", hisuid, "ChatNotification");
         Sender sender = new Sender(data, token);
         apiService.sendNotification(sender).enqueue(new Callback<Response>() {
             @Override

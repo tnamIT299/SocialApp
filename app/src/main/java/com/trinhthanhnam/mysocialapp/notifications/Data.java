@@ -6,13 +6,23 @@ public class Data {
     private String body;
     private String title;
     private String sented;
+    private String notificationType;
 
-    public Data(String user, Integer icon, String body, String title, String sented) {
+    public Data(String user, Integer icon, String body, String title, String sented,String notificationType) {
         this.user = user;
         this.icon = icon;
         this.body = body;
         this.title = title;
         this.sented = sented;
+        this.notificationType = notificationType;
+    }
+
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
     }
 
     public String getUser() {
