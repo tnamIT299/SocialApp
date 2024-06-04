@@ -273,24 +273,18 @@ public class ProfileFragment extends Fragment {
                                     txt_name.setText(name);
                                     txt_email.setText(email);
                                     txt_phone.setText(phone);
-
-                                    try {
-                                        Glide.with(getActivity())
-                                                .load(image)
-                                                .into(avatarIv);
-                                    } catch (Exception e) {
+                                    if(image != null && !image.isEmpty()) {
+                                        Picasso.get().load(image).into(avatarIv);
+                                    } else {
                                         //load default image
-                                        Glide.with(getActivity())
-                                                .load(R.drawable.logo)
-                                                .into(avatarIv);
+                                        Picasso.get().load(R.drawable.logo).into(avatarIv);
                                     }
 
-                                    try {
-                                        Glide.with(getActivity())
-                                                .load(cover)
-                                                .into(coverIv);
-                                    } catch (Exception e) {
+                                    if(cover != null && !cover.isEmpty()) {
+                                        Picasso.get().load(cover).into(coverIv);
+                                    } else {
                                         //load default image
+                                        Picasso.get().load(R.drawable.logo).into(coverIv);
                                     }
 
 
