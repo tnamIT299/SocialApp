@@ -434,10 +434,11 @@ public class PostDetailActivity extends AppCompatActivity {
                     myName = ""+ds.child("name").getValue();
                     myDp = ""+ds.child("image").getValue();
                     //set data
-                    try{
-                        Picasso.get().load(myDp).placeholder(R.drawable.baseline_account_circle_24).into(AvatarImg);
-                    }catch (Exception e){
-                        Picasso.get().load(R.drawable.baseline_account_circle_24).into(AvatarImg);
+                    if(myDp != null && !myDp.isEmpty()) {
+                        Picasso.get().load(myDp).into(AvatarImg);
+                    } else {
+                        //load default image
+                        Picasso.get().load(R.drawable.logo).into(AvatarImg);
                     }
                 }
             }
@@ -512,10 +513,12 @@ public class PostDetailActivity extends AppCompatActivity {
                         }
                     }
                     // set user image in comment part
-                    try {
-                        Picasso.get().load(hisDp).placeholder(R.drawable.baseline_account_circle_24).into(postUImg);
-                    }catch (Exception e){
-                        Picasso.get().load(R.drawable.baseline_account_circle_24).into(postUImg);
+
+                    if(hisDp != null && !hisDp.isEmpty()) {
+                        Picasso.get().load(hisDp).into(postUImg);
+                    } else {
+                        //load default image
+                        Picasso.get().load(R.drawable.logo).into(postUImg);
                     }
                 }
             }

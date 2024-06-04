@@ -69,7 +69,7 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
                     .placeholder(R.drawable.baseline_account_circle_24)
                     .into(holder.avatarIv);
         }catch (Exception e){
-            holder.avatarIv.setImageResource(R.drawable.baseline_account_circle_24);
+            holder.avatarIv.setImageResource(R.drawable.logo);
         }
         holder.blockIv.setImageResource(R.drawable.ic_unblocked);
         checkIsBlocked(hisUID,holder,position);

@@ -100,7 +100,7 @@ public class AdapterGroupChat extends RecyclerView.Adapter<AdapterGroupChat.MyHo
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             for (DataSnapshot ds : snapshot.getChildren()){
                                                 String name = ""+ds.child("name").getValue();
-                                                holder.senderNameTv.setText(name);
+                                                holder.senderNameTv.setText(name+ " : ");
                                             }
                                         }
 

@@ -190,7 +190,8 @@ public class UsersFragment extends Fragment {
                 for (DataSnapshot ds : snapshot.getChildren()){
                     User user = ds.getValue(User.class);
                     // get all users except currently signed in user
-                    if (!user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                    FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (fUser != null && user != null && user.getUid() != null && !user.getUid().equals(fUser.getUid())){
                         if (user.getName().toLowerCase().contains(query.toLowerCase()) ||
                                 user.getEmail().toLowerCase().contains(query.toLowerCase())) {
                             userList.add(user);

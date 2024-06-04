@@ -180,44 +180,6 @@ public class ProfileFragment extends Fragment {
         postList = new ArrayList<>();
 
 
-//        Query query = databaseReference.orderByChild("email").equalTo(user.getEmail());
-//        query.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot ds : snapshot.getChildren()) {
-//                    //get data
-//                    String name =  "" + ds.child("name").getValue();
-//                    String email = "" + ds.child("email").getValue();
-//                    String phone = "" + ds.child("phone").getValue();
-//                    String image = "" + ds.child("image").getValue();
-//                    String cover = "" + ds.child("cover").getValue();
-//
-//                    //set data
-//                    txt_name.setText(name);
-//                    txt_email.setText(email);
-//                    txt_phone.setText(phone);
-//                   try {
-//                       Picasso.get().load(image).into(avatarIv);
-//                   }catch (Exception e) {
-//                       //load default image
-//                       Picasso.get().load(R.drawable.logo).into(avatarIv);
-//                   }
-//
-//                    try {
-//                        Picasso.get().load(cover).into(coverIv);
-//                    }catch (Exception e) {
-//                        //load default image
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-
         //fab_button
         addFab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -67,6 +67,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private RecyclerView chatRcv;
     private ArrayList<Group_Chat> groupChatList;
     private AdapterGroup_Chat adapterGroup_chat;
+    boolean notify = false;
 
     //permisson request constants
     private static final int CAMERA_REQUEST_CODE = 200;

@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.trinhthanhnam.mysocialapp.NotificationFragment;
 import com.trinhthanhnam.mysocialapp.PostDetailActivity;
 import com.trinhthanhnam.mysocialapp.R;
@@ -78,12 +79,11 @@ public class AdapterNotification extends RecyclerView.Adapter<AdapterNotificatio
                     notification.setsImage(image);
                     //set to views
                     holder.nameTv.setText(name);
-                    try {
-                        //if image is received then set
-                        Glide.with(context).load(image).into(holder.avatarIv);
-                    } catch (Exception e) {
-                        //if there is any exception while getting image then set default
-                        holder.avatarIv.setImageResource(R.drawable.baseline_account_circle_24);
+                    if(image != null && !image.isEmpty()) {
+                        Picasso.get().load(image).into(holder.avatarIv);
+                    } else {
+                        //load default image
+                        Picasso.get().load(R.drawable.logo).into(holder.avatarIv);
                     }
                 }
             }

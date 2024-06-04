@@ -36,7 +36,7 @@
             android:layout_toEndOf="@+id/groupIconIv"
             android:layout_below="@+id/groupNameTv"
             android:layout_marginStart="4dp"
-            android:text="Sender Name : "
+            android:text="Sender Name"
             android:textColor="@color/black">
         </TextView>
 

@@ -646,12 +646,6 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds: snapshot.getChildren()){
                     Chat chat = ds.getValue(Chat.class);
-//                    if(chat.getReceiver().equals(myUid) && chat.getSender().equals(hisuid)){
-//                        HashMap<String, Object> hasSeenHashMap = new HashMap<>();
-//                        hasSeenHashMap.put("isSeen", true);
-//                        ds.getRef().updateChildren(hasSeenHashMap);
-//                    }
-
                     if (chat != null && myUid != null && hisuid != null) {
                         if ((chat.getReceiver() != null && chat.getReceiver().equals(myUid)) && (chat.getSender() != null && chat.getSender().equals(hisuid))) {
                             HashMap<String, Object> hasSeenHashMap = new HashMap<>();

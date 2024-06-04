@@ -74,7 +74,7 @@ public class AddPostActivity extends AppCompatActivity {
     DatabaseReference userDbRef;
     EditText titleEt, descriptionEt;
     ImageView imageIv;
-    Button uploadBtn;
+    Button uploadBtn,btnImage;
     //User Infor
     String name, email, uid, dp;
     String edtTitle, edtDescription, edtImage;
@@ -102,6 +102,7 @@ public class AddPostActivity extends AppCompatActivity {
         descriptionEt = findViewById(R.id.edtDescription);
         imageIv = findViewById(R.id.imageIv);
         uploadBtn = findViewById(R.id.btnUpload);
+        btnImage = findViewById(R.id.btnImage);
 
         //get data through intent from previous activities
         Intent intent = getIntent();
@@ -147,7 +148,7 @@ public class AddPostActivity extends AppCompatActivity {
 
 
         //get image from gallery/camera on click
-        imageIv.setOnClickListener(new View.OnClickListener() {
+        btnImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showImagePickDialog();
@@ -453,6 +454,8 @@ public class AddPostActivity extends AppCompatActivity {
                                         ""+title+ "\n" + description,
                                         "PostNotification",
                                         "POST");
+
+
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -507,6 +510,9 @@ public class AddPostActivity extends AppCompatActivity {
                             ""+title+ "\n" + description,
                             "PostNotification",
                             "POST");
+
+                    //send notification to NotificationsFragment
+                    addToAllUsersNotifications(""+timeStamp, ""+name+ " add new post ");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -518,6 +524,45 @@ public class AddPostActivity extends AppCompatActivity {
         }
 
     }
+
+    private void addToAllUsersNotifications(String pId, String notification){
+        String timestamp = ""+System.currentTimeMillis();
+        HashMap<Object, String> hashMap = new HashMap<>();
+        hashMap.put("pId", pId);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("notification", notification);
+        hashMap.put("sUid", uid);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    String uid = ds.getKey();
+                    ref.child(uid).child("Notifications").child(timestamp).setValue(hashMap)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(AddPostActivity.this, "Error", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
 
     private void prepareNotify(String pId , String title , String description , String notifyType , String notiTopic){
         String NOTIFICATION_TOPIC = "/topics/"+notiTopic;
