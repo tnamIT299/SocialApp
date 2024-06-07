@@ -76,7 +76,7 @@ public class AddPostActivity extends AppCompatActivity {
     ImageView imageIv;
     Button uploadBtn,btnImage;
     //User Infor
-    String name, email, uid, dp;
+    String name, email, myuid, dp;
     String edtTitle, edtDescription, edtImage;
     Uri uriImage = null;
     //progress bar
@@ -229,7 +229,7 @@ public class AddPostActivity extends AppCompatActivity {
                 String downloadUri = uriTask.getResult().toString();
                 if (uriTask.isSuccessful()){
                     HashMap<String , Object> hashMap = new HashMap<>();
-                    hashMap.put("uid", uid);
+                    hashMap.put("uid", myuid);
                     hashMap.put("uName", name);
                     hashMap.put("uEmail", email);
                     hashMap.put("uDp", dp);
@@ -269,7 +269,7 @@ public class AddPostActivity extends AppCompatActivity {
 
     private void updateWithoutImage(String title, String description, String edtPostId) {
         HashMap<String , Object> hashMap = new HashMap<>();
-        hashMap.put("uid", uid);
+        hashMap.put("uid", myuid);
         hashMap.put("uName", name);
         hashMap.put("uEmail", email);
         hashMap.put("uDp", dp);
@@ -320,7 +320,7 @@ public class AddPostActivity extends AppCompatActivity {
                         String downloadUri = uriTask.getResult().toString();
                         if (uriTask.isSuccessful()){
                             HashMap<String , Object> hashMap = new HashMap<>();
-                            hashMap.put("uid", uid);
+                            hashMap.put("uid", myuid);
                             hashMap.put("uName", name);
                             hashMap.put("uEmail", email);
                             hashMap.put("uDp", dp);
@@ -422,7 +422,7 @@ public class AddPostActivity extends AppCompatActivity {
                     if(uriTask.isSuccessful()){
                         //create post
                         HashMap<Object, String> hashMap = new HashMap<>();
-                        hashMap.put("uid", uid);
+                        hashMap.put("uid", myuid);
                         hashMap.put("uName", name);
                         hashMap.put("uEmail", email);
                         hashMap.put("uDp", dp);
@@ -478,7 +478,7 @@ public class AddPostActivity extends AppCompatActivity {
             System.out.println("No image");
             //post without image
             HashMap<Object, String> hashMap = new HashMap<>();
-            hashMap.put("uid", uid);
+            hashMap.put("uid", myuid);
             hashMap.put("uName", name);
             hashMap.put("uEmail", email);
             hashMap.put("uDp", dp);
@@ -531,7 +531,7 @@ public class AddPostActivity extends AppCompatActivity {
         hashMap.put("pId", pId);
         hashMap.put("timestamp", timestamp);
         hashMap.put("notification", notification);
-        hashMap.put("sUid", uid);
+        hashMap.put("sUid", myuid);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -539,19 +539,21 @@ public class AddPostActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     String uid = ds.getKey();
-                    ref.child(uid).child("Notifications").child(timestamp).setValue(hashMap)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
+                    if (!uid.equals(myuid)) {
+                        ref.child(uid).child("Notifications").child(timestamp).setValue(hashMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
 
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
                 }
             }
 
@@ -577,7 +579,7 @@ public class AddPostActivity extends AppCompatActivity {
         try {
             //what to send
             notificationBodyJo.put("notificationType", NOTIFICATION_TYPE);
-            notificationBodyJo.put("sender", uid);
+            notificationBodyJo.put("sender", myuid);
             notificationBodyJo.put("pId", pId);
             notificationBodyJo.put("pTitle", NOTIFICATION_TITLE);
             notificationBodyJo.put("pDescription", NOTIFICATION_MESSAGE);
@@ -719,7 +721,7 @@ public class AddPostActivity extends AppCompatActivity {
             //set email of logged in user
             // txt_proFile.setText(user.getEmail());
             email = user.getEmail();
-            uid = user.getUid();
+            myuid = user.getUid();
         }else{
             startActivity(new Intent(this, MainActivity.class));
             finish();
