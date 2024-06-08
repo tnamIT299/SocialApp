@@ -15,10 +15,6 @@ public class FirebaseService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if (firebaseUser != null) {
-//            updateTokenInFirebaseDatabase(token);
-//        }
-
         if (firebaseUser != null) {
             // Update token in the database
             updateTokenInFirebaseDatabase(firebaseUser.getUid(), token);
@@ -26,11 +22,6 @@ public class FirebaseService extends FirebaseMessagingService {
     }
 
     private void updateTokenInFirebaseDatabase(String userId,String newToken) {
-//        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
-//        Token token = new Token(newToken);
-//        reference.child(firebaseUser.getUid()).setValue(token);
-
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("Tokens").child(userId);
 
         // Assuming you're storing the token under a child named 'fcmToken'

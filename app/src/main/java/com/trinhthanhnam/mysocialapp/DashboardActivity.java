@@ -30,11 +30,10 @@ import com.trinhthanhnam.mysocialapp.notifications.Token;
 
 public class DashboardActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
-    TextView txt_proFile;
+
     String mUID;
     private AlertDialog alertDialog;
     BottomNavigationView navigationView;
-
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -42,7 +41,6 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // Check if we need to show GroupFragment
         boolean showGroupFragment = getIntent().getBooleanExtra("showGroupFragment", false);
         System.out.println("showGroupFragment: " + showGroupFragment);
         if (showGroupFragment) {
@@ -59,7 +57,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         //init
-       // txt_proFile=findViewById(R.id.txt_profile);
+        // txt_proFile=findViewById(R.id.txt_profile);
         firebaseAuth = FirebaseAuth.getInstance();
 
         navigationView = findViewById(R.id.bottom_navigation);
@@ -72,9 +70,7 @@ public class DashboardActivity extends AppCompatActivity {
             if (!task.isSuccessful()) {
                 return;
             }
-            // Get new FCM registration token
             String token = task.getResult();
-            // Pass the token to updateToken function
             updateToken(token);
         });
 
@@ -91,59 +87,45 @@ public class DashboardActivity extends AppCompatActivity {
         Token mToken = new Token(token);
         ref.child(mUID).setValue(mToken);
 
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Tokens");
-//        // Lưu token với key là 'fcmToken'
-//        ref.child("fcmToken").setValue(token);
-
-//        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if (firebaseUser != null) {
-//            String userId = firebaseUser.getUid();
-//            DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("Tokens").child(userId);
-//            databaseRef.child("fcmToken").setValue(token)
-//                    .addOnSuccessListener(aVoid -> Log.d("FCM", "Token successfully updated."))
-//                    .addOnFailureListener(e -> Log.e("FCM", "Failed to update token", e));
-//        } else {
-//            Log.d("FCM", "No user signed in, cannot update token.");
-//        }
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener=
             new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-            //handle item click
-           if( menuItem.getItemId() == R.id.nav_home){
-               HomeFragment homeFragment = new HomeFragment();
-               FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-               ft1.replace(R.id.container, homeFragment,"");
-               ft1.commit();
-               return true;
-           } else if (menuItem.getItemId() == R.id.nav_profie) {
-               ProfileFragment profileFragment = new ProfileFragment();
-               FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
-               ft2.replace(R.id.container, profileFragment,"");
-               ft2.commit();
-               return true;
-           } else if (menuItem.getItemId() == R.id.nav_chat) {
-               ChatFragment chatFragment = new ChatFragment();
-               FragmentTransaction ft5 = getSupportFragmentManager().beginTransaction();
-               ft5.replace(R.id.container, chatFragment,"");
-               ft5.commit();
-               return true;
-           }
-           else if (menuItem.getItemId() == R.id.nav_user){
-               UsersFragment usersFragment = new UsersFragment();
-               FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
-               ft3.replace(R.id.container, usersFragment,"");
-               ft3.commit();
-               return true;
-           }
-           else if (menuItem.getItemId() == R.id.nav_mutilChoice){
-               showMoreOptions();
-           }
-            return false;
-        }
-    };
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                    //handle item click
+                    if( menuItem.getItemId() == R.id.nav_home){
+                        HomeFragment homeFragment = new HomeFragment();
+                        FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
+                        ft1.replace(R.id.container, homeFragment,"");
+                        ft1.commit();
+                        return true;
+                    } else if (menuItem.getItemId() == R.id.nav_profie) {
+                        ProfileFragment profileFragment = new ProfileFragment();
+                        FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
+                        ft2.replace(R.id.container, profileFragment,"");
+                        ft2.commit();
+                        return true;
+                    } else if (menuItem.getItemId() == R.id.nav_chat) {
+                        ChatFragment chatFragment = new ChatFragment();
+                        FragmentTransaction ft5 = getSupportFragmentManager().beginTransaction();
+                        ft5.replace(R.id.container, chatFragment,"");
+                        ft5.commit();
+                        return true;
+                    }
+                    else if (menuItem.getItemId() == R.id.nav_user){
+                        UsersFragment usersFragment = new UsersFragment();
+                        FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
+                        ft3.replace(R.id.container, usersFragment,"");
+                        ft3.commit();
+                        return true;
+                    }
+                    else if (menuItem.getItemId() == R.id.nav_mutilChoice){
+                        showMoreOptions();
+                    }
+                    return false;
+                }
+            };
 
     private void showMoreOptions() {
         PopupMenu popupMenu = new PopupMenu(this, navigationView , Gravity.END);
@@ -159,9 +141,9 @@ public class DashboardActivity extends AppCompatActivity {
                 if(id == 0) {
                     //Notifications
                     NotificationFragment notiFragment = new NotificationFragment();
-                   FragmentTransaction ft6 = getSupportFragmentManager().beginTransaction();
-                   ft6.replace(R.id.container, notiFragment,"");
-                   ft6.commit();
+                    FragmentTransaction ft6 = getSupportFragmentManager().beginTransaction();
+                    ft6.replace(R.id.container, notiFragment,"");
+                    ft6.commit();
                 } else if(id == 1){
                     //Group Chats
                     GroupChatFragment groupChatFragment = new GroupChatFragment();
@@ -187,7 +169,7 @@ public class DashboardActivity extends AppCompatActivity {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if(user!=null){
             //set email of logged in user
-           // txt_proFile.setText(user.getEmail());
+            // txt_proFile.setText(user.getEmail());
             mUID = user.getUid();
             SharedPreferences sp = getSharedPreferences("SP_USER",MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();

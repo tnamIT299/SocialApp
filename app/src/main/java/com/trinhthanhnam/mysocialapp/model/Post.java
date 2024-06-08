@@ -1,7 +1,15 @@
 package com.trinhthanhnam.mysocialapp.model;
 
 public class Post {
-    String pId , pTitle , pDescr,pLikes,pComments , pImage , pTime , uid , uEmail , uDp , uName;
+    String pId , pTitle , pDescr,pLikes,pComments , pImage ,pVideo,  pTime , uid , uEmail , uDp , uName;
+
+    public String getpVideo() {
+        return pVideo;
+    }
+
+    public void setpVideo(String pVideo) {
+        this.pVideo = pVideo;
+    }
 
     public String getpId() {
         return pId;
@@ -91,7 +99,7 @@ public class Post {
         this.uName = uName;
     }
 
-    public Post(String pId, String pTitle, String pDescr, String pLikes, String pComments, String pImage, String pTime, String uid, String uEmail, String uDp, String uName) {
+    public Post(String pId, String pTitle, String pDescr, String pLikes, String pComments, String pImage,String pVideo, String pTime, String uid, String uEmail, String uDp, String uName) {
         this.pId = pId;
         this.pTitle = pTitle;
         this.pDescr = pDescr;
@@ -103,6 +111,7 @@ public class Post {
         this.uEmail = uEmail;
         this.uDp = uDp;
         this.uName = uName;
+        this.pVideo = pVideo;
     }
 
 

@@ -89,19 +89,6 @@
             android:textSize="18sp"
             android:text="Login"/>
 
-        <ImageButton
-            android:id="@+id/btn_ggSign"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/google"
-            android:background="#ffffff"
-            android:scaleType="fitXY"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"
-            android:text="Login"/>
-
-
-
 
         <TextView
             android:id="@+id/txt_nothave_account"

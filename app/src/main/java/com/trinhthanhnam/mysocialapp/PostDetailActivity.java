@@ -1,5 +1,6 @@
 package com.trinhthanhnam.mysocialapp;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,6 +23,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -50,8 +54,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class PostDetailActivity extends AppCompatActivity {
-    String myUid, myEmail, myName, myDp,postId,pLikes,hisDp,hisName,hisUid,pImage;
+    String myUid, myEmail, myName, myDp,postId,pLikes,hisDp,hisName,hisUid,pImage, pVideo;
     ImageView postImageIv,postUImg,AvatarImg;
+    PlayerView postVideo;
     TextView postUName,postTime,postTitleTv,postDescriptionTv,postLikeTv,postCommentTv;
     ImageButton btnMore,btnSend;
     Button btnLike,btnShare;
@@ -63,7 +68,11 @@ public class PostDetailActivity extends AppCompatActivity {
     List<Comment> commentList;
     AdapterComment adapterComment;
     RecyclerView recyclerView;
+    ExoPlayer player;
 
+
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +95,7 @@ public class PostDetailActivity extends AppCompatActivity {
         btnShare = findViewById(R.id.btnShare);
         commentRecyclerView = findViewById(R.id.commentRecyclerView);
         edtComment = findViewById(R.id.edtComment);
+        postVideo = findViewById(R.id.postVideo);
 
         loadPostInfo();
         checkUserStatus();
@@ -244,11 +254,48 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void beginDelete() {
-        if(pImage.equals("noImage")){
+        if(pImage==null && pVideo==null ){
             deleteWithoutImage();
-        } else {
+        }
+        if(pImage!=null && pVideo==null ) {
             deleteWithImage();
         }
+        if(pImage==null && pVideo!=null ) {
+            deleteWithVideo();
+        }
+    }
+
+    private void deleteWithVideo() {
+        ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("Deleting...");
+        StorageReference picRef = FirebaseStorage.getInstance().getReferenceFromUrl(pVideo);
+        picRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Query fquery = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(postId);
+                fquery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot ds: snapshot.getChildren()){
+                            ds.getRef().removeValue();
+                        }
+                        Toast.makeText(PostDetailActivity.this, "Deleted successfully", Toast.LENGTH_SHORT).show();
+                        pd.dismiss();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(PostDetailActivity.this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void deleteWithImage() {
@@ -467,6 +514,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     String uEmail = ""+ds.child("uEmail").getValue();
                     hisName = ""+ds.child("uName").getValue();
                     String commentCount = ""+ds.child("pComments").getValue();
+                    pVideo = ""+ds.child("pVideo").getValue();
 
                     Calendar calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
@@ -482,6 +530,9 @@ public class PostDetailActivity extends AppCompatActivity {
                             }
                         }
                     });
+
+
+
                     postLikeTv.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -499,9 +550,22 @@ public class PostDetailActivity extends AppCompatActivity {
                     postUName.setText(hisName);
                     postCommentTv.setText(commentCount+" Comments");
 
-                    if(pImage.equals("noImage")){
+                    if (pVideo != null  && pImage == null) {
+                        player = new ExoPlayer.Builder(PostDetailActivity.this).build();
+                        postVideo.setPlayer(player);
+                        // Set the media item to be played
+                        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(pVideo));
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                        player.play();
+                        postVideo.setVisibility(View.VISIBLE);
+                        postImageIv.setVisibility(View.GONE);
+                    }
+
+                    if(pImage == null){
                         postImageIv.setVisibility(View.GONE);
                     } else {
+                        postVideo.setVisibility(View.GONE);
                         postImageIv.setVisibility(View.VISIBLE);
                         try{
                             Glide.with(PostDetailActivity.this)
@@ -512,6 +576,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
                         }
                     }
+
                     // set user image in comment part
 
                     if(hisDp != null && !hisDp.isEmpty()) {

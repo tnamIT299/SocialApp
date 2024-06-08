@@ -35,8 +35,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 public class OptionFragment extends Fragment {
     LinearLayout btn_logout;
     FirebaseAuth firebaseAuth;
-    SwitchCompat switchNigthMode,switchNotify;
-    boolean isNightMode ;
+    SwitchCompat switchNotify;
+
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     private static final String TOPIC_POST_NOTIFICATION = "POST";
@@ -88,19 +88,14 @@ public class OptionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_option, container, false);
         firebaseAuth = FirebaseAuth.getInstance();
         btn_logout = view.findViewById(R.id.btnLogout);
-        switchNigthMode= view.findViewById(R.id.switchNightMode);
         switchNotify= view.findViewById(R.id.switchNotify);
         sharedPreferences = getActivity().getSharedPreferences("NightModePrefs",MODE_PRIVATE);
         sharedPreferences = getActivity().getSharedPreferences("Notification_SP",MODE_PRIVATE);
         boolean isPostEnabled = sharedPreferences.getBoolean(""+TOPIC_POST_NOTIFICATION,false);
-        isNightMode = sharedPreferences.getBoolean("NightMode", false);
-        switchNigthMode.setChecked(isNightMode);
-        setSwitchNigthMode();
         setswitchNotify();
 
         if(isPostEnabled) {
@@ -109,11 +104,6 @@ public class OptionFragment extends Fragment {
             switchNotify.setChecked(false);
         }
 
-        if (isNightMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,22 +156,7 @@ public class OptionFragment extends Fragment {
         });
     }
 
-    private void setSwitchNigthMode(){
-        switchNigthMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    editor.putBoolean("NightMode", true);
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    editor.putBoolean("NightMode", false);
-                }
-                editor.apply();
-            }
-        });
-    }
+
 
     private void checkUserstatus(){
         //get current user

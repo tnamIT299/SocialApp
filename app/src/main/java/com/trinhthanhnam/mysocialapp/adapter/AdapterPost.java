@@ -28,6 +28,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -64,6 +67,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
     String myUid;
     private DatabaseReference likesRef;
     private DatabaseReference postsRef;
+    ExoPlayer player;
 
     boolean mProcessLike = false;
 
@@ -85,21 +89,28 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
-            String uid = postList.get(position).getUid();
-            String uEmail = postList.get(position).getuEmail();
-            String uName = postList.get(position).getuName();
-            String uDp = postList.get(position).getuDp();
-            String pId = postList.get(position).getpId();
-            String pTitle = postList.get(position).getpTitle();
-            String pDescr = postList.get(position).getpDescr();
-            String pImage = postList.get(position).getpImage();
-            String pTimeStamp= postList.get(position).getpTime();
-            String pLikes= postList.get(position).getpLikes();
-            String pComments= postList.get(position).getpComments();
+        String uid = postList.get(position).getUid();
+        String uEmail = postList.get(position).getuEmail();
+        String uName = postList.get(position).getuName();
+        String uDp = postList.get(position).getuDp();
+        String pId = postList.get(position).getpId();
+        String pTitle = postList.get(position).getpTitle();
+        String pDescr = postList.get(position).getpDescr();
+        String pImage = postList.get(position).getpImage();
+        String pVideo = postList.get(position).getpVideo();
+        String pTimeStamp = postList.get(position).getpTime();
+        String pLikes= postList.get(position).getpLikes();
+        String pComments= postList.get(position).getpComments();
 
-
-        long onlineStatusTime = Long.parseLong(pTimeStamp);
-        String pTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+        System.out.println("pTimeStamp: " + pTimeStamp);
+        String pTime= null;
+        long onlineStatusTime =0;
+        if (pTimeStamp != null && !pTimeStamp.isEmpty()) {
+            onlineStatusTime = Long.parseLong(pTimeStamp);
+            pTime = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+        }else{
+            onlineStatusTime = 0;
+        }
 
         //set data
         holder.uNameTv.setText(uName);
@@ -116,18 +127,33 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
                 .placeholder(R.drawable.baseline_account_circle_24)
                 .into(holder.uPictureIv);
 
-        // Use Glide to load the post image if it exists
-        if(pImage.equals("noImage")){
+
+        if (pVideo != null && !pVideo.isEmpty() && pImage == null) {
+            player = new ExoPlayer.Builder(context).build();
+            holder.postVideo.setPlayer(player);
+            // Set the media item to be played
+            MediaItem mediaItem = MediaItem.fromUri(Uri.parse(pVideo));
+            System.out.println("sRCVideo: " + pVideo);
+            player.setMediaItem(mediaItem);
+            player.prepare();
+            player.play();
+            holder.postVideo.setVisibility(View.VISIBLE);
             holder.pImageIv.setVisibility(View.GONE);
-        } else {
+        }
+
+        // Use Glide to load the post image if it exists
+        if( pImage == null && pVideo == null){
+            holder.pImageIv.setVisibility(View.GONE);
+            holder.postVideo.setVisibility(View.GONE);
+        } else if(pImage != null && !pImage.isEmpty() && pVideo == null) {
             holder.pImageIv.setVisibility(View.VISIBLE);
+            holder.postVideo.setVisibility(View.GONE);
             try{
                 Glide.with(context)
                         .load(pImage)
                         .into(holder.pImageIv);
 
             }catch (Exception e){
-
             }
             holder.pImageIv.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -138,11 +164,13 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
                 }
             });
         }
+
+
         //handle item click
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    showMoreOptions(holder.moreBtn, uid, myUid, pId, pImage);
+                showMoreOptions(holder.moreBtn, uid, myUid, pId, pImage,pVideo);
             }
         });
 
@@ -246,7 +274,6 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         String shareBody = pTitle + "\n" + pDescr;
         //first we will save this image in cache, get the saved image uri
         Uri uri = saveImageToShare(bitmap);
-
         //share intent
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -328,7 +355,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         });
     }
 
-    private void showMoreOptions(ImageButton moreBtn, String uid, String myUid, String pId, String pImage) {
+    private void showMoreOptions(ImageButton moreBtn, String uid, String myUid, String pId, String pImage, String pVideo) {
         PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         if(uid.equals(myUid)){
             //add items in menu
@@ -342,7 +369,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 if(id == 0){
-                   beginDelete(pId, pImage);
+                    beginDelete(pId, pImage, pVideo);
                 } else if(id == 1){
                     Intent intent = new Intent(context, AddPostActivity.class);
                     intent.putExtra("key", "editPost");
@@ -359,12 +386,50 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
         popupMenu.show();
     }
 
-    private void beginDelete(String pId, String pImage) {
-        if(pImage.equals("noImage")){
+    private void beginDelete(String pId, String pImage, String pVideo) {
+        if(pImage == null && pVideo == null){
             deleteWithoutImage(pId);
-        } else {
+        }
+        if(pImage != null && pVideo == null) {
             deleteWithImage(pId, pImage);
         }
+        if(pImage == null && pVideo != null) {
+            deleteWithVideo(pId, pVideo);
+        }
+    }
+
+    private void deleteWithVideo(String pId, String pVideo) {
+
+        ProgressDialog pd = new ProgressDialog(context);
+        pd.setMessage("Deleting...");
+        StorageReference picRef = FirebaseStorage.getInstance().getReferenceFromUrl(pVideo);
+        picRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Query fquery = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(pId);
+                fquery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot ds: snapshot.getChildren()){
+                            ds.getRef().removeValue();
+                        }
+                        Toast.makeText(context, "Deleted successfully", Toast.LENGTH_SHORT).show();
+                        pd.dismiss();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                pd.dismiss();
+                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void deleteWithImage(String pId, String pImage) {
@@ -430,16 +495,19 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
     //view holder
     class MyHolder extends RecyclerView.ViewHolder{
         ImageView uPictureIv, pImageIv;
+        PlayerView postVideo;
         TextView uNameTv, pTimeTv, pTitleTv, pDescriptionTv, pLikesTv,pCommentsTv;
         ImageButton moreBtn;
         Button likeBtn, commentBtn, shareBtn;
 
         LinearLayout profileLayout;
+        @SuppressLint("WrongViewCast")
         public MyHolder(@NonNull View itemView) {
             super(itemView);
             //init views
             uPictureIv = itemView.findViewById(R.id.postUImg);
             pImageIv = itemView.findViewById(R.id.postImageIv);
+            postVideo = itemView.findViewById(R.id.postVideo);
             uNameTv = itemView.findViewById(R.id.postUName);
             pTimeTv = itemView.findViewById(R.id.postTime);
             pTitleTv = itemView.findViewById(R.id.postTitleTv);
@@ -451,6 +519,19 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             shareBtn = itemView.findViewById(R.id.btnShare);
             profileLayout = itemView.findViewById(R.id.profileLayout);
             pCommentsTv = itemView.findViewById(R.id.pCommentsTv);
+
+            itemView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(@NonNull View v) {
+                }
+                @Override
+                public void onViewDetachedFromWindow(@NonNull View v) {
+                    if (player != null) {
+                        player.release();
+                        player = null;
+                    }
+                }
+            });
 
         }
     }

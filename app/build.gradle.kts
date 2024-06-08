@@ -50,6 +50,9 @@ dependencies {
     implementation ("io.jsonwebtoken:jjwt:0.9.1")
     implementation ("com.auth0:java-jwt:3.18.2")
     implementation ("com.google.android.material:material:1.6.0")
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
 
     //google
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))

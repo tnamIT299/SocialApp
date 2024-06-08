@@ -19,15 +19,6 @@
         android:layout_marginBottom="20dp"
         />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchNightMode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Night Mode"
-        android:layout_margin="10dp"
-        android:textSize="20sp"
-        android:textColor="@android:color/black" />
-
     <!-- Notification Switch -->
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switchNotify"

@@ -32,6 +32,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
@@ -74,14 +77,18 @@ public class AddPostActivity extends AppCompatActivity {
     DatabaseReference userDbRef;
     EditText titleEt, descriptionEt;
     ImageView imageIv;
+    //VideoView videoView;
     Button uploadBtn,btnImage;
     //User Infor
     String name, email, myuid, dp;
-    String edtTitle, edtDescription, edtImage;
+    String edtTitle, edtDescription, edtImage, edtVideo;
     Uri uriImage = null;
     //progress bar
     ProgressDialog progressBar;
+    ExoPlayer player;
+    PlayerView videoView;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +108,7 @@ public class AddPostActivity extends AppCompatActivity {
         titleEt = findViewById(R.id.edtTitle);
         descriptionEt = findViewById(R.id.edtDescription);
         imageIv = findViewById(R.id.imageIv);
+        videoView = findViewById(R.id.videoView);
         uploadBtn = findViewById(R.id.btnUpload);
         btnImage = findViewById(R.id.btnImage);
 
@@ -114,6 +122,8 @@ public class AddPostActivity extends AppCompatActivity {
                 handleSendText(intent); // Handle text being sent
             } else if (type.startsWith("image/")) {
                 handleSendImage(intent); // Handle single image being sent
+            }else if (type.startsWith("video/")) {
+                handleSendVideo(intent); // Handle single video being sent
             }
         }
         String isUpdateKey = ""+intent.getStringExtra("key");
@@ -146,8 +156,6 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
 
-
-        //get image from gallery/camera on click
         btnImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,11 +189,27 @@ public class AddPostActivity extends AppCompatActivity {
 
     }
 
+
     private void handleSendImage(Intent intent) {
         Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             uriImage = imageUri;
             imageIv.setImageURI(imageUri);
+        }
+    }
+
+    private void handleSendVideo(Intent intent) {
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            uriImage = imageUri;
+            player = new ExoPlayer.Builder(AddPostActivity.this).build();
+            videoView.setPlayer(player);
+            // Set the media item to be played
+            MediaItem mediaItem = MediaItem.fromUri(uriImage);
+            System.out.println("uriImageVideo: " + uriImage);
+            player.setMediaItem(mediaItem);
+            player.prepare();
+            player.play();
         }
     }
 
@@ -199,21 +223,93 @@ public class AddPostActivity extends AppCompatActivity {
     private void beginUpdate(String title, String description, String edtPostId) {
         progressBar.setMessage("Updating post...");
         progressBar.show();
-        if (!edtImage.equals("noImage")){
-            //with image
-            updateWasWithImage(title, description, edtPostId);
-        }else if (imageIv.getDrawable() != null){
-            //with image
-            updateWithNowImage(title, description, edtPostId);
-        }else {
-            //without image
-            updateWithoutImage(title, description, edtPostId);
+        if (uriImage != null) {
+            if (videoView.getPlayer() == null) {
+                updateWithNowImage(title, description, edtPostId);
+            } else {
+                updateWithNowVideo(title, description, edtPostId);
+            }
+        } else {
+            updateWasWithImageandVideo(title, description, edtPostId);
         }
+
+    }
+
+    private void updateWithNowVideo(String title, String description, String edtPostId) {
+        progressBar.setMessage("Updating post...");
+        progressBar.show();
+        final String timeStamp = String.valueOf(System.currentTimeMillis());
+        String filePathAndName = "Posts/" + "post_" + edtPostId;
+        Uri videoUri = uriImage;
+        System.out.println("Video URI: " + videoUri);
+        StorageReference ref = FirebaseStorage.getInstance().getReference().child(filePathAndName);
+        ref.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                while (!uriTask.isSuccessful()) ;
+                String downloadUri = uriTask.getResult().toString();
+                if (uriTask.isSuccessful()) {
+                    HashMap<Object, String> hashMap = new HashMap<>();
+                    hashMap.put("uid", myuid);
+                    hashMap.put("uName", name);
+                    hashMap.put("uEmail", email);
+                    hashMap.put("uDp", dp);
+                    hashMap.put("pId", edtPostId);
+                    hashMap.put("pTitle", title);
+                    hashMap.put("pDescr", description);
+                    hashMap.put("pVideo", downloadUri);
+                    hashMap.put("pImage", null);
+                    hashMap.put("pTime", timeStamp);
+                    hashMap.put("pLikes", "0");
+                    hashMap.put("pComments", "0");
+
+                    //path to store post data
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                    //put data in this ref
+                    ref.child(edtPostId).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            progressBar.dismiss();
+                            Toast.makeText(AddPostActivity.this, "Post updated", Toast.LENGTH_SHORT).show();
+                            //reset views
+                            titleEt.setText("");
+                            descriptionEt.setText("");
+                            imageIv.setImageURI(null);
+                            uriImage = null;
+                            videoView.setPlayer(null);
+
+                            //send notification
+                            prepareNotify("" + edtPostId,
+                                    "" + name + " update new post",
+                                    "" + title + "\n" + description,
+                                    "PostNotification",
+                                    "POST");
+                            //send notification to NotificationsFragment
+                            addToAllUsersNotifications("" + edtPostId, "" + name + " update new post ");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressBar.dismiss();
+                            Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progressBar.dismiss();
+                Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateWithNowImage(String title, String description, String edtPostId) {
         String timeStamp = String.valueOf(System.currentTimeMillis());
-        String filePathAndName = "Posts/" + "post_" + timeStamp;
+        String filePathAndName = "Posts/" + "post_" + edtPostId;
 
         Bitmap bitmap = ((BitmapDrawable) imageIv.getDrawable()).getBitmap();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -237,6 +333,7 @@ public class AddPostActivity extends AppCompatActivity {
                     hashMap.put("pTitle", title);
                     hashMap.put("pDescr", description);
                     hashMap.put("pImage", downloadUri);
+                    hashMap.put("pVideo", null);
 
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
                     ref.child(edtPostId).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -248,6 +345,15 @@ public class AddPostActivity extends AppCompatActivity {
                             descriptionEt.setText("");
                             imageIv.setImageURI(null);
                             uriImage = null;
+
+                            //send notification
+                            prepareNotify("" + edtPostId,
+                                    "" + name + " update new post",
+                                    "" + title + "\n" + description,
+                                    "PostNotification",
+                                    "POST");
+                            //send notification to NotificationsFragment
+                            addToAllUsersNotifications("" + edtPostId, "" + name + " update new post ");
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -267,95 +373,136 @@ public class AddPostActivity extends AppCompatActivity {
         });
     }
 
-    private void updateWithoutImage(String title, String description, String edtPostId) {
-        HashMap<String , Object> hashMap = new HashMap<>();
-        hashMap.put("uid", myuid);
-        hashMap.put("uName", name);
-        hashMap.put("uEmail", email);
-        hashMap.put("uDp", dp);
-        hashMap.put("pId", edtPostId);
-        hashMap.put("pTitle", title);
-        hashMap.put("pDescr", description);
-        hashMap.put("pImage", "noImage");
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-        ref.child(edtPostId).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                progressBar.dismiss();
-                Toast.makeText(AddPostActivity.this, "Post updated...", Toast.LENGTH_SHORT).show();
-                titleEt.setText("");
-                descriptionEt.setText("");
-                imageIv.setImageURI(null);
-                uriImage = null;
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                progressBar.dismiss();
-                Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void updateWasWithImage(String title, String description, String edtPostId) {
+    private void updateWasWithImageandVideo(String title, String description, String edtPostId) {
         StorageReference mPictureRef = FirebaseStorage.getInstance().getReferenceFromUrl(edtImage);
         mPictureRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 String timeStamp = String.valueOf(System.currentTimeMillis());
-                String filePathAndName = "Posts/" + "post_" + timeStamp;
+                String filePathAndName = "Posts/" + "post_" + edtPostId;
+                if(imageIv.getDrawable() != null) {
+                    Bitmap bitmap = ((BitmapDrawable) imageIv.getDrawable()).getBitmap();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    //image compress
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    byte[] data = baos.toByteArray();
+                    StorageReference ref = FirebaseStorage.getInstance().getReference().child(filePathAndName);
+                    ref.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!uriTask.isSuccessful());
+                            String downloadUri = uriTask.getResult().toString();
+                            if (uriTask.isSuccessful()){
+                                HashMap<String , Object> hashMap = new HashMap<>();
+                                hashMap.put("uid", myuid);
+                                hashMap.put("uName", name);
+                                hashMap.put("uEmail", email);
+                                hashMap.put("uDp", dp);
+                                hashMap.put("pId", edtPostId);
+                                hashMap.put("pTitle", title);
+                                hashMap.put("pDescr", description);
+                                hashMap.put("pImage", downloadUri);
 
-                Bitmap bitmap = ((BitmapDrawable) imageIv.getDrawable()).getBitmap();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                //image compress
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-                byte[] data = baos.toByteArray();
-                StorageReference ref = FirebaseStorage.getInstance().getReference().child(filePathAndName);
-                ref.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!uriTask.isSuccessful());
-                        String downloadUri = uriTask.getResult().toString();
-                        if (uriTask.isSuccessful()){
-                            HashMap<String , Object> hashMap = new HashMap<>();
-                            hashMap.put("uid", myuid);
-                            hashMap.put("uName", name);
-                            hashMap.put("uEmail", email);
-                            hashMap.put("uDp", dp);
-                            hashMap.put("pId", edtPostId);
-                            hashMap.put("pTitle", title);
-                            hashMap.put("pDescr", description);
-                            hashMap.put("pImage", downloadUri);
-
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-                            ref.child(edtPostId).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    progressBar.dismiss();
-                                    Toast.makeText(AddPostActivity.this, "Post updated...", Toast.LENGTH_SHORT).show();
-                                    titleEt.setText("");
-                                    descriptionEt.setText("");
-                                    imageIv.setImageURI(null);
-                                    uriImage = null;
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    progressBar.dismiss();
-                                    Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                                ref.child(edtPostId).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        progressBar.dismiss();
+                                        Toast.makeText(AddPostActivity.this, "Post updated...", Toast.LENGTH_SHORT).show();
+                                        titleEt.setText("");
+                                        descriptionEt.setText("");
+                                        imageIv.setImageURI(null);
+                                        uriImage = null;
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        progressBar.dismiss();
+                                        Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressBar.dismiss();
+                            Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                else if(uriImage != null) {
+                    if (videoView != null) {
+                        //get video from video view
+                        Uri videoUri = uriImage;
+                        System.out.println("Video URI: " + videoUri);
+                        StorageReference ref = FirebaseStorage.getInstance().getReference().child(filePathAndName);
+                        ref.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                while (!uriTask.isSuccessful()) ;
+                                String downloadUri = uriTask.getResult().toString();
+                                if (uriTask.isSuccessful()) {
+                                    //create post
+                                    HashMap<Object, String> hashMap = new HashMap<>();
+                                    hashMap.put("uid", myuid);
+                                    hashMap.put("uName", name);
+                                    hashMap.put("uEmail", email);
+                                    hashMap.put("uDp", dp);
+                                    hashMap.put("pId", edtPostId);
+                                    hashMap.put("pTitle", title);
+                                    hashMap.put("pDescr", description);
+                                    hashMap.put("pVideo", downloadUri);
+                                    hashMap.put("pImage", null);
+                                    hashMap.put("pTime", timeStamp);
+
+                                    //path to store post data
+                                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                                    //put data in this ref
+                                    ref.child(timeStamp).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            progressBar.dismiss();
+                                            Toast.makeText(AddPostActivity.this, "Post updated", Toast.LENGTH_SHORT).show();
+                                            //reset views
+                                            titleEt.setText("");
+                                            descriptionEt.setText("");
+                                            imageIv.setImageURI(null);
+                                            uriImage = null;
+                                            videoView.setPlayer(null);
+
+                                            //send notification
+                                            prepareNotify("" + edtPostId,
+                                                    "" + name + " update new post",
+                                                    "" + title + "\n" + description,
+                                                    "PostNotification",
+                                                    "POST");
+                                            //send notification to NotificationsFragment
+                                            addToAllUsersNotifications("" + edtPostId, "" + name + " update new post ");
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            progressBar.dismiss();
+                                            Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                progressBar.dismiss();
+                                Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressBar.dismiss();
-                        Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -377,11 +524,32 @@ public class AddPostActivity extends AppCompatActivity {
                     edtTitle = ""+ds.child("pTitle").getValue();
                     edtDescription = ""+ds.child("pDescr").getValue();
                     edtImage = ""+ds.child("pImage").getValue();
-
+                    edtVideo = ""+ds.child("pVideo").getValue();
                     titleEt.setText(edtTitle);
                     descriptionEt.setText(edtDescription);
 
-                    if (!edtImage.equals("noImage")){
+                    if(edtVideo == null){
+                        videoView.setVisibility(View.VISIBLE);
+                        try{
+                            player = new ExoPlayer.Builder(AddPostActivity.this).build();
+                            videoView.setPlayer(player);
+                            // Set the media item to be played
+                            MediaItem mediaItem = MediaItem.fromUri(Uri.parse(edtVideo));
+                            player.setMediaItem(mediaItem);
+                            player.prepare();
+                            player.play();
+                            imageIv.setVisibility(View.GONE);
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }else{
+                        videoView.setVisibility(View.GONE);
+                        imageIv.setVisibility(View.VISIBLE);
+                    }
+                    if (edtImage == null){
+                        imageIv.setVisibility(View.VISIBLE);
+                        videoView.setVisibility(View.GONE);
                         try{
                             Glide.with(AddPostActivity.this)
                                     .load(edtImage)
@@ -399,12 +567,12 @@ public class AddPostActivity extends AppCompatActivity {
             }
         });
     }
-
     private void uploadData(String title, String description) {
         progressBar.setMessage("Publishing post...");
         progressBar.show();
         final String timeStamp = String.valueOf(System.currentTimeMillis());
         String filePathAndName = "Posts/" + "post_" + timeStamp;
+
         if(imageIv.getDrawable() != null) {
             //get image from image view
             Bitmap bitmap = ((BitmapDrawable) imageIv.getDrawable()).getBitmap();
@@ -430,6 +598,7 @@ public class AddPostActivity extends AppCompatActivity {
                         hashMap.put("pTitle", title);
                         hashMap.put("pDescr", description);
                         hashMap.put("pImage", downloadUri);
+                        hashMap.put("pVideo", null);
                         hashMap.put("pTime", timeStamp);
                         hashMap.put("pLikes", "0");
                         hashMap.put("pComments", "0");
@@ -450,10 +619,12 @@ public class AddPostActivity extends AppCompatActivity {
 
                                 //send notification
                                 prepareNotify(""+timeStamp,
-                                        ""+name+"add new post",
+                                        ""+name+" add new post",
                                         ""+title+ "\n" + description,
                                         "PostNotification",
                                         "POST");
+                                //send notification to NotificationsFragment
+                                addToAllUsersNotifications("" + timeStamp, "" + name + " add new post ");
 
 
                             }
@@ -474,8 +645,81 @@ public class AddPostActivity extends AppCompatActivity {
                     Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-        }else{
-            System.out.println("No image");
+            return;
+        }
+
+        if(uriImage != null) {
+            if (videoView != null) {
+                //get video from video view
+                Uri videoUri = uriImage;
+                System.out.println("Video URI: " + videoUri);
+                StorageReference ref = FirebaseStorage.getInstance().getReference().child(filePathAndName);
+                ref.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!uriTask.isSuccessful()) ;
+                        String downloadUri = uriTask.getResult().toString();
+                        if (uriTask.isSuccessful()) {
+                            //create post
+                            HashMap<Object, String> hashMap = new HashMap<>();
+                            hashMap.put("uid", myuid);
+                            hashMap.put("uName", name);
+                            hashMap.put("uEmail", email);
+                            hashMap.put("uDp", dp);
+                            hashMap.put("pId", timeStamp);
+                            hashMap.put("pTitle", title);
+                            hashMap.put("pDescr", description);
+                            hashMap.put("pVideo", downloadUri);
+                            hashMap.put("pImage", null);
+                            hashMap.put("pTime", timeStamp);
+                            hashMap.put("pLikes", "0");
+                            hashMap.put("pComments", "0");
+
+                            //path to store post data
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                            //put data in this ref
+                            ref.child(timeStamp).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    progressBar.dismiss();
+                                    Toast.makeText(AddPostActivity.this, "Post published", Toast.LENGTH_SHORT).show();
+                                    //reset views
+                                    titleEt.setText("");
+                                    descriptionEt.setText("");
+                                    imageIv.setImageURI(null);
+                                    uriImage = null;
+                                    videoView.setPlayer(null);
+
+                                    //send notification
+                                    prepareNotify("" + timeStamp,
+                                            "" + name + " add new post",
+                                            "" + title + "\n" + description,
+                                            "PostNotification",
+                                            "POST");
+                                    //send notification to NotificationsFragment
+                                    addToAllUsersNotifications("" + timeStamp, "" + name + " add new post ");
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    progressBar.dismiss();
+                                    Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressBar.dismiss();
+                        Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        } else {
             //post without image
             HashMap<Object, String> hashMap = new HashMap<>();
             hashMap.put("uid", myuid);
@@ -485,7 +729,8 @@ public class AddPostActivity extends AppCompatActivity {
             hashMap.put("pId", timeStamp);
             hashMap.put("pTitle", title);
             hashMap.put("pDescr", description);
-            hashMap.put("pImage", "noImage");
+            hashMap.put("pImage", null);
+            hashMap.put("pVideo", null);
             hashMap.put("pTime", timeStamp);
             hashMap.put("pLikes", "0");
             hashMap.put("pComments", "0");
@@ -505,25 +750,25 @@ public class AddPostActivity extends AppCompatActivity {
                     uriImage = null;
 
                     //send notification
-                    prepareNotify(""+timeStamp,
-                            ""+name+ " add new post ",
-                            ""+title+ "\n" + description,
+                    prepareNotify("" + timeStamp,
+                            "" + name + " add new post ",
+                            "" + title + "\n" + description,
                             "PostNotification",
                             "POST");
 
                     //send notification to NotificationsFragment
-                    addToAllUsersNotifications(""+timeStamp, ""+name+ " add new post ");
+                    addToAllUsersNotifications("" + timeStamp, "" + name + " add new post ");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressBar.dismiss();
-                    Toast.makeText(AddPostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
-
     }
+
 
     private void addToAllUsersNotifications(String pId, String notification){
         String timestamp = ""+System.currentTimeMillis();
@@ -667,7 +912,9 @@ public class AddPostActivity extends AppCompatActivity {
 
     private void pickFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
+        intent.setType("*/*");
+        String[] mimeTypes = {"image/*", "video/*"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, IMAGE_PICK_GALLERY_CODE);
     }
 
@@ -763,7 +1010,6 @@ public class AddPostActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -771,7 +1017,28 @@ public class AddPostActivity extends AppCompatActivity {
             if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                 if (data != null) {
                     uriImage = data.getData();
-                    imageIv.setImageURI(uriImage);
+                    // Check if the selected file is an image or video
+                    String path = uriImage.getPath();
+                    if (path.contains("images")) {
+                        // Handle image
+                        imageIv.setImageURI(uriImage);
+                        System.out.println("uriImageImage: " + uriImage);
+                        imageIv.setVisibility(View.VISIBLE);
+                        videoView.setVisibility(View.GONE);
+                    } else if (path.contains("video")) {
+                        // Handle video
+                        player = new ExoPlayer.Builder(AddPostActivity.this).build();
+                        videoView.setPlayer(player);
+                        // Set the media item to be played
+                        MediaItem mediaItem = MediaItem.fromUri(uriImage);
+                        System.out.println("uriImageVideo: " + uriImage);
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                        player.play();
+                        videoView.setVisibility(View.VISIBLE);
+                        imageIv.setVisibility(View.GONE);
+
+                    }
                 } else {
                     Toast.makeText(this, "Không thể lấy ảnh từ thư viện", Toast.LENGTH_SHORT).show();
                 }

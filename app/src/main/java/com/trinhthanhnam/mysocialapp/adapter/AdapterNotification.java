@@ -55,13 +55,13 @@ public class AdapterNotification extends RecyclerView.Adapter<AdapterNotificatio
 
     @Override
     public void onBindViewHolder(@NonNull HolderNotification holder, @SuppressLint("RecyclerView") int position) {
-        Notification notification = notificationList.get(position);
-        String name = notification.getsName();
-        String notificationStr = notification.getNotification();
-        String image = notification.getsImage();
-        String timestamp = notification.getTimestamp();
-        String senderUid = notification.getsUid();
-        String pId = notification.getpId();
+        //Notification notification = notificationList.get(position);
+        String name = notificationList.get(position).getsName();
+        String notificationStr = notificationList.get(position).getNotification();
+        String image = notificationList.get(position).getsImage();
+        String timestamp = notificationList.get(position).getTimestamp();
+        String senderUid = notificationList.get(position).getsUid();
+        String pId = notificationList.get(position).getpId();
 
         long onlineStatusTime = Long.parseLong(timestamp);
         String timeAgo = (String) DateUtils.getRelativeTimeSpanString(onlineStatusTime, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
@@ -75,8 +75,8 @@ public class AdapterNotification extends RecyclerView.Adapter<AdapterNotificatio
                     String image = "" + ds.child("image").getValue();
 
                     //add to model
-                    notification.setsName(name);
-                    notification.setsImage(image);
+                    notificationList.get(position).setsName(name);
+                    notificationList.get(position).setsImage(image);
                     //set to views
                     holder.nameTv.setText(name);
                     if(image != null && !image.isEmpty()) {
@@ -95,10 +95,8 @@ public class AdapterNotification extends RecyclerView.Adapter<AdapterNotificatio
         holder.notificationTv.setText(notificationStr);
         holder.timeTv.setText(timeAgo);
         try {
-            //if image is received then set
             Glide.with(context).load(image).into(holder.avatarIv);
         } catch (Exception e) {
-            //if there is any exception while getting image then set default
             holder.avatarIv.setImageResource(R.drawable.baseline_account_circle_24);
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {

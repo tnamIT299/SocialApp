@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.OnBackPressedDispatcher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -148,46 +150,74 @@ public class HomeFragment extends Fragment {
     private void loadapterPost() {
         new Thread(new Runnable() {
             public void run() {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-            layoutManager.setStackFromEnd(true);
-            layoutManager.setReverseLayout(true);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+                LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                layoutManager.setStackFromEnd(true);
+                layoutManager.setReverseLayout(true);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.setLayoutManager(layoutManager);
+                    }
+                });
 
-                    recyclerView.setLayoutManager(layoutManager);
-                }
-            });
-
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    postList.clear();
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        Post post = ds.getValue(Post.class);
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+                ref.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Post post = dataSnapshot.getValue(Post.class);
                         postList.add(post);
-                    }
-                    if (getActivity() != null) {
-                        adapterPost = new AdapterPost(getActivity(), postList);
-                        recyclerView.setAdapter(adapterPost);
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                                adapterPost = new AdapterPost(getActivity(), postList);
+                                recyclerView.setAdapter(adapterPost);
                             }
                         });
                     }
-                }
-            });
-        }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Post updatedPost = dataSnapshot.getValue(Post.class);
+                        int index = -1;
+                        for (int i = 0; i < postList.size(); i++) {
+                            if (postList.get(i).getpId().equals(updatedPost.getpId())) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index != -1) {
+                            postList.set(index, updatedPost);
+                            int finalIndex = index;
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapterPost.notifyItemChanged(finalIndex);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         }).start();
     }
 
@@ -215,32 +245,5 @@ public class HomeFragment extends Fragment {
         });
 
     }
-
-//    private void getAllPost() {
-//        // Get reference to the "Posts" node in Firebase
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-//        // Attach a listener to read the data at our posts reference
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                postList.clear();
-//                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    Post post = ds.getValue(Post.class);
-//                    postList.add(post);
-//                }
-//                // Notify the adapter that the data set has changed
-//                if(adapterPost != null){
-//                    adapterPost.notifyDataSetChanged();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                // Log the error message to the console
-//                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
 
 }

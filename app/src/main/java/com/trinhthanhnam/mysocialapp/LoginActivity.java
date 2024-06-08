@@ -39,12 +39,6 @@ import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
 
-    GoogleSignInOptions gso;
-    GoogleSignInClient gsc;
-    ImageButton btn_ggSign;
-
-    private static final int RC_SIGN_IN = 100;
-    GoogleSignInClient mGoogleSignInClient;
     EditText edt_email, edt_pass;
     TextView txt_nothave_acc, txt_fogotPass;
     Button btn_login;
@@ -62,18 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         btn_login=findViewById(R.id.btn_login);
         txt_nothave_acc=findViewById(R.id.txt_nothave_account);
         txt_fogotPass=findViewById(R.id.txt_fogotPass);
-        btn_ggSign=findViewById(R.id.btn_ggSign);
 
-        gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gsc= GoogleSignIn.getClient(this, gso);
-
-        //before auth
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("36445327318-f1cgjppsg4qmgsg1pmhsiguidvf7imu0.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         auth = FirebaseAuth.getInstance();
 
 
@@ -91,21 +74,6 @@ public class LoginActivity extends AppCompatActivity {
                     ///valid email
                     loginUser(email , pass);
                 }
-            }
-        });
-
-//        btn_ggSign.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-//                startActivityForResult(signInIntent, RC_SIGN_IN);
-//            }
-//        });
-
-        btn_ggSign.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
             }
         });
 
@@ -128,10 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setTitle("Logging....");
     }
 
-    private void signIn() {
-        Intent signIntent = gsc.getSignInIntent();
-        startActivityForResult(signIntent, 1000);
-    }
+
 
     private void showRecoverDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -197,8 +162,6 @@ public class LoginActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     progressDialog.dismiss();
                     FirebaseUser user = auth.getCurrentUser();
-
-
                     startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                     finish();
                 }else{
@@ -232,56 +195,5 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-
-    private void firebaseAuthwithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
-        auth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    FirebaseUser user = auth.getCurrentUser();
-
-                    //get user email and uid from auth
-                    String email = user.getEmail();
-                    String uid = user.getUid();
-
-                    //using Háhmap
-                    HashMap<Object, String> hashMap = new HashMap<>();
-
-                    //put into in hashmap
-                    hashMap.put("email", email);
-                    hashMap.put("uid", uid);
-                    hashMap.put("name", "");
-                    hashMap.put("onlineStatus", "online");
-                    hashMap.put("typingTo", "noOne");
-                    hashMap.put("phone", "");
-                    hashMap.put("image", "");
-                    hashMap.put("cover", "");
-
-
-                    //Firebase data instance
-                    FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-socialapp-6aaa9-default-rtdb.firebaseio.com/");
-                    //path to store data named "Users"
-                    DatabaseReference reference = database.getReference("Users");
-
-                    //put data within hashmap in database
-                    reference.child(uid).setValue(hashMap);
-                    Toast.makeText(LoginActivity.this, ""+user.getEmail(), Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
-                    finish();
-                }else{
-                    Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 }

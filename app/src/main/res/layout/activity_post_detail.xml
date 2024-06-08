@@ -112,7 +112,17 @@
                         android:id="@+id/postImageIv"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:background="@color/white"></ImageView>
+                        android:background="@color/white"
+                        android:visibility="gone"
+                        ></ImageView>
+
+                    <androidx.media3.ui.PlayerView
+                        android:id="@+id/postVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@color/white"
+                        android:paddingBottom="8dp"
+                        android:visibility="gone"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -155,7 +165,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:backgroundTint="#A89E9E"
+                            android:backgroundTint="@color/lavender"
                             android:drawableLeft="@drawable/like"
                             android:drawablePadding="5dp"
                             android:layout_marginRight="5dp"
@@ -166,7 +176,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:backgroundTint="#A89E9E"
+                            android:backgroundTint="@color/lavender"
                             android:drawableLeft="@drawable/share"
                             android:drawablePadding="5dp"
                             android:text="Share"></Button>

@@ -40,8 +40,17 @@
             android:id="@+id/imageIv"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:minHeight="200dp">
-        </ImageView>
+            android:minHeight="200dp"
+            ></ImageView>
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:minHeight="200dp"
+            android:layout_gravity="center"
+            android:visibility="gone">
+        </androidx.media3.ui.PlayerView>
 
         <EditText
             android:id="@+id/edtDescription"
