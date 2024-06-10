@@ -66,7 +66,7 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
         try{
             Glide.with(mContext)
                     .load(userImage)
-                    .placeholder(R.drawable.baseline_account_circle_24)
+                    .placeholder(R.drawable.logo)
                     .into(holder.avatarIv);
         }catch (Exception e){
             holder.avatarIv.setImageResource(R.drawable.logo);

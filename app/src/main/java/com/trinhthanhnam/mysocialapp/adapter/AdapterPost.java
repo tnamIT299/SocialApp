@@ -151,6 +151,7 @@ public class AdapterPost extends RecyclerView.Adapter<AdapterPost.MyHolder> {
             try{
                 Glide.with(context)
                         .load(pImage)
+                        .placeholder(R.drawable.logo)
                         .into(holder.pImageIv);
 
             }catch (Exception e){

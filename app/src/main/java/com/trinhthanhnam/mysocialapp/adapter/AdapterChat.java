@@ -91,9 +91,9 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MyHolder>{
 
         holder.timeTv.setText(dateTime);
         try{
-            Picasso.get().load(imageUrl).into(holder.profileIv);
+            Picasso.get().load(imageUrl).placeholder(R.drawable.logo).into(holder.profileIv);
         }catch (Exception e){
-            //there is exception getting picture
+            holder.profileIv.setImageResource(R.drawable.logo);
         }
         //click to show delete dialog
         holder.messageLayout.setOnLongClickListener(new View.OnLongClickListener() {

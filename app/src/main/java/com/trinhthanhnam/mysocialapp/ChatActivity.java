@@ -225,9 +225,9 @@ public class ChatActivity extends AppCompatActivity {
                     }
 
                     try{
-                        Picasso.get().load(hisImage).into(profileIv);
+                        Picasso.get().load(hisImage).placeholder(R.drawable.logo).into(profileIv);
                     }catch (Exception e){
-                        profileIv.setImageResource(R.drawable.baseline_account_circle_24);
+                        profileIv.setImageResource(R.drawable.logo);
                     }
                 }
             }
