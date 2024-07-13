@@ -1,6 +1,6 @@
 # Social App 📱
-Công cụ: Android Studio , Firebase , API Stringee
-Ngôn ngữ : Java
+  - Công cụ: Android Studio , Firebase , API Stringee
+  - Ngôn ngữ : Java
 
 # Chức năng
 
