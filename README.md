@@ -2,7 +2,7 @@
   - Công cụ: Android Studio , Firebase , API Stringee
   - Ngôn ngữ : Java
 
-<img src="https://www.svgrepo.com/show/475631/android-color.svg" alt="Android Studio" width="60" height="60"/> <img src="https://www.svgrepo.com/show/373595/firebase.svg" alt="Firebase" width="60" height="60"/><img src="https://www.svgrepo.com/show/303654/java-logo.svg" alt="Java" width="70" height="70"/> <img src="https://i-startup.vnecdn.net/2019/06/19/stringee-headline-photo-1560930820.png" alt="Stringee" width="60" height="60"/>
+<img src="https://www.svgrepo.com/show/475631/android-color.svg" alt="Android Studio" width="60" height="60"/> <img src="https://www.svgrepo.com/show/373595/firebase.svg" alt="Firebase" width="60" height="60"/><img src="https://www.svgrepo.com/show/303654/java-logo.svg" alt="Java" width="70" height="70"/> <img src="https://i-startup.vnecdn.net/2019/06/19/stringee-headline-photo-1560930820.png" alt="Stringee" width="120" height="80"/>
 
 # Chức năng
 
