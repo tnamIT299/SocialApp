@@ -81,6 +81,7 @@ public class ProfileFragment extends Fragment {
     ImageView avatarIv,coverIv;
     TextView txt_name, txt_email, txt_phone;
     FloatingActionButton addFab;
+    Button btnAddFriend;
     RecyclerView recyclerViewPost;
 
     EditText searchEdt;
@@ -171,6 +172,7 @@ public class ProfileFragment extends Fragment {
         addFab = view.findViewById(R.id.add_fab);
         searchEdt = view.findViewById(R.id.searchEdt);
         recyclerViewPost = view.findViewById(R.id.recyclerViewPost);
+        btnAddFriend = view.findViewById(R.id.btnAddFriend);
         auth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(getActivity());
         checkUserstatus();
@@ -178,6 +180,15 @@ public class ProfileFragment extends Fragment {
         loadMyPosts();
 
         postList = new ArrayList<>();
+
+        //addFirend
+        btnAddFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnAddFriend.setText("Cancel");
+                btnAddFriend.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_person_add_disabled_24,0,0,0);
+            }
+        });
 
 
         //fab_button
